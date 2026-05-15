@@ -10,6 +10,10 @@
     "db:push": "pnpm -F server db:push",
     "db:studio": "pnpm -F server db:studio"
   },
+  "dependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@prisma/client",
