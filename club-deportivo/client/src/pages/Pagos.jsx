@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { pagosService, sociosService, deportesService } from '../services'
 import { pagoSchema } from '../schemas'
-import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw } from 'lucide-react'
+import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard } from 'lucide-react'
 import { formatCurrency, MESES } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -27,6 +27,9 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table'
+import { TableSkeleton } from '../components/Skeleton'
+import Pagination from '../components/Pagination'
+import EmptyState from '../components/EmptyState'
 
 const selectStyles = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 
@@ -42,25 +45,28 @@ const estadoVariant = {
   VENCIDO: 'destructive',
 }
 
-const estadoColor = {
-  PAGADO: 'text-green-600',
-  PENDIENTE: 'text-yellow-600',
-  VENCIDO: 'text-destructive',
-}
+const FILTROS = [
+  { value: '', label: 'Todos' },
+  { value: 'PENDIENTE', label: 'Pendientes' },
+  { value: 'VENCIDO', label: 'Vencidos' },
+  { value: 'PAGADO', label: 'Pagados' },
+]
 
 export default function Pagos() {
   const queryClient = useQueryClient()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSocio, setSelectedSocio] = useState(null)
   const [filterEstado, setFilterEstado] = useState('')
+  const [page, setPage] = useState(1)
+  const limit = 15
 
   const now = new Date()
   const currentMes = now.getMonth() + 1
   const currentAnio = now.getFullYear()
 
   const { data: pagosData, isLoading } = useQuery({
-    queryKey: ['pagos', filterEstado],
-    queryFn: () => pagosService.getAll({ estado: filterEstado || undefined, limit: 100 }).then((res) => res.data),
+    queryKey: ['pagos', filterEstado, page],
+    queryFn: () => pagosService.getAll({ estado: filterEstado || undefined, page, limit }).then((res) => res.data),
   })
 
   const { data: socios } = useQuery({
@@ -95,15 +101,15 @@ export default function Pagos() {
     mutationFn: pagosService.generateMonthly,
     onSuccess: (res) => {
       queryClient.invalidateQueries(['pagos'])
-      toast.success(res.data.message)
+      toast.success(res.data.message || 'Cuotas generadas correctamente')
     },
+    onError: (err) => toast.error(err.response?.data?.message || 'Error al generar cuotas'),
   })
 
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     setValue,
     formState: { errors },
   } = useForm({
@@ -128,99 +134,112 @@ export default function Pagos() {
   const pagos = pagosData?.data || []
   const sociosList = socios?.data || []
   const deportesList = deportes?.data || []
+  const pagination = pagosData?.pagination
+  const total = pagination?.total ?? pagos.length
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Pagos</h1>
           <p className="text-muted-foreground">Gestion de cuotas y pagos</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => generateMutation.mutate()}>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="secondary" onClick={() => generateMutation.mutate()} size="sm">
             <RefreshCw className="h-4 w-4" />
-            Generar Cuotas del Mes
+            Generar Cuotas
           </Button>
-          <Button onClick={() => { reset(); setModalOpen(true) }}>
+          <Button onClick={() => { reset(); setModalOpen(true) }} size="sm">
             <Plus className="h-4 w-4" />
             Registrar Pago
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {['', 'PAGADO', 'PENDIENTE', 'VENCIDO'].map((estado) => (
+      <div className="flex gap-1.5 overflow-x-auto pb-1">
+        {FILTROS.map(({ value, label }) => (
           <Button
-            key={estado}
-            variant={filterEstado === estado ? 'default' : 'outline'}
+            key={value}
+            variant={filterEstado === value ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilterEstado(estado)}
+            onClick={() => { setFilterEstado(value); setPage(1) }}
+            className="shrink-0"
           >
-            {estado || 'Todos'}
+            {label}
           </Button>
         ))}
       </div>
 
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Socio</TableHead>
-                <TableHead>Deporte</TableHead>
-                <TableHead>Periodo</TableHead>
-                <TableHead>Monto</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha Pago</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                    Cargando...
-                  </TableCell>
-                </TableRow>
-              ) : pagos.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                    No hay pagos registrados
-                  </TableCell>
-                </TableRow>
-              ) : (
-                pagos.map((pago) => {
-                  const Icon = estadoIcon[pago.estado]
-                  return (
-                    <TableRow key={pago.id}>
-                      <TableCell className="font-medium">
-                        {pago.socio.nombre} {pago.socio.apellido}
-                      </TableCell>
-                      <TableCell>{pago.deporte.nombre}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {MESES[pago.mes - 1]} {pago.anio}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatCurrency(pago.monto)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={estadoVariant[pago.estado]} className="gap-1.5">
-                          <Icon className={`h-3.5 w-3.5 ${estadoColor[pago.estado]}`} />
-                          {pago.estado}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {pago.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-AR') : '-'}
-                      </TableCell>
+          {isLoading ? (
+            <TableSkeleton rows={8} cols={6} />
+          ) : pagos.length === 0 ? (
+            <EmptyState
+              icon={CreditCard}
+              title="No hay pagos registrados"
+              description={filterEstado ? 'No hay pagos con ese estado.' : 'Todavia no se registraron pagos en el sistema.'}
+              action={!filterEstado ? { label: 'Generar Cuotas', onClick: () => generateMutation.mutate() } : undefined}
+            />
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Socio</TableHead>
+                      <TableHead className="hidden sm:table-cell">Deporte</TableHead>
+                      <TableHead>Periodo</TableHead>
+                      <TableHead>Monto</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="hidden md:table-cell">Fecha Pago</TableHead>
                     </TableRow>
-                  )
-                })
+                  </TableHeader>
+                  <TableBody>
+                    {pagos.map((pago) => {
+                      const Icon = estadoIcon[pago.estado]
+                      const iconColor = pago.estado === 'PAGADO' ? 'text-emerald-600' : pago.estado === 'PENDIENTE' ? 'text-amber-600' : 'text-destructive'
+                      return (
+                        <TableRow key={pago.id}>
+                          <TableCell className="font-medium">
+                            {pago.socio?.nombre} {pago.socio?.apellido}
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">{pago.deporte?.nombre}</TableCell>
+                          <TableCell className="text-muted-foreground whitespace-nowrap">
+                            {MESES[pago.mes - 1]?.slice(0, 3)} {pago.anio}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {formatCurrency(pago.monto)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={estadoVariant[pago.estado]} className="gap-1">
+                              <Icon className={`h-3 w-3 ${iconColor}`} />
+                              <span className="hidden xs:inline">{pago.estado}</span>
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground">
+                            {pago.fechaPago ? formatDate(pago.fechaPago) : '-'}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+              {pagination && (
+                <Pagination
+                  page={pagination.page}
+                  pages={pagination.pages}
+                  total={pagination.total}
+                  onPageChange={setPage}
+                />
               )}
-            </TableBody>
-          </Table>
+            </>
+          )}
         </CardContent>
       </Card>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) reset() }}>
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) { reset(); setSelectedSocio(null) } }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Registrar Pago</DialogTitle>
@@ -259,7 +278,7 @@ export default function Pagos() {
                 <Label htmlFor="mes">Mes</Label>
                 <select id="mes" {...register('mes')} className={selectStyles}>
                   {MESES.map((mes, i) => (
-                    <option key={i} value={i + 1}>{mes}</option>
+                    <option key={i} value={i + 1}>{mes.slice(0, 3)}</option>
                   ))}
                 </select>
               </div>
@@ -275,8 +294,8 @@ export default function Pagos() {
             </div>
 
             {deudas && deudas.deudasPorDeporte.length > 0 && (
-              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-                <h4 className="mb-2 text-sm font-medium text-yellow-800">Deudas pendientes del socio:</h4>
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 sm:p-4">
+                <h4 className="mb-2 text-sm font-medium text-amber-800">Deudas pendientes del socio:</h4>
                 <div className="space-y-1">
                   {deudas.deudasPorDeporte.map((d) => (
                     <div key={d.deporteId} className="flex justify-between text-sm">
@@ -288,11 +307,11 @@ export default function Pagos() {
               </div>
             )}
 
-            <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); reset() }}>
+            <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); reset(); setSelectedSocio(null) }}>
                 Cancelar
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
                 Registrar Pago
               </Button>
             </DialogFooter>

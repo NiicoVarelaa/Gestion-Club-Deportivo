@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { sociosService } from '../services'
 import { socioSchema } from '../schemas'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -27,6 +27,10 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table'
+import { TableSkeleton } from '../components/Skeleton'
+import Pagination from '../components/Pagination'
+import EmptyState from '../components/EmptyState'
+import { useDebounce } from '../hooks/useDebounce'
 
 export default function Socios() {
   const queryClient = useQueryClient()
@@ -34,10 +38,14 @@ export default function Socios() {
   const [deleteDialog, setDeleteDialog] = useState(null)
   const [search, setSearch] = useState('')
   const [editingSocio, setEditingSocio] = useState(null)
+  const [page, setPage] = useState(1)
+  const limit = 10
+
+  const debouncedSearch = useDebounce(search, 300)
 
   const { data, isLoading } = useQuery({
-    queryKey: ['socios', search],
-    queryFn: () => sociosService.getAll({ search, limit: 50 }).then((res) => res.data),
+    queryKey: ['socios', debouncedSearch, page],
+    queryFn: () => sociosService.getAll({ search: debouncedSearch, page, limit }).then((res) => res.data),
   })
 
   const createMutation = useMutation({
@@ -66,9 +74,10 @@ export default function Socios() {
     mutationFn: sociosService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries(['socios'])
-      toast.success('Socio dado de baja')
+      toast.success('Socio dado de baja correctamente')
       setDeleteDialog(null)
     },
+    onError: (err) => toast.error(err.response?.data?.message || 'Error al dar de baja'),
   })
 
   const {
@@ -109,15 +118,17 @@ export default function Socios() {
   }
 
   const socios = data?.data || []
+  const pagination = data?.pagination
+  const total = pagination?.total ?? socios.length
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Socios</h1>
-          <p className="text-muted-foreground">{socios.length} socios registrados</p>
+          <p className="text-muted-foreground">{total} socios registrados</p>
         </div>
-        <Button onClick={() => { resetForm(); setModalOpen(true) }}>
+        <Button onClick={() => { resetForm(); setModalOpen(true) }} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Nuevo Socio
         </Button>
@@ -129,71 +140,80 @@ export default function Socios() {
           type="text"
           placeholder="Buscar por nombre, apellido, DNI o email..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           className="pl-10"
         />
       </div>
 
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>DNI</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefono</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                    Cargando...
-                  </TableCell>
-                </TableRow>
-              ) : socios.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                    No se encontraron socios
-                  </TableCell>
-                </TableRow>
-              ) : (
-                socios.map((socio) => (
-                  <TableRow key={socio.id}>
-                    <TableCell className="font-medium">
-                      {socio.nombre} {socio.apellido}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{socio.dni}</TableCell>
-                    <TableCell className="text-muted-foreground">{socio.email}</TableCell>
-                    <TableCell className="text-muted-foreground">{socio.telefono || '-'}</TableCell>
-                    <TableCell>
-                      <Badge variant={socio.activo ? 'default' : 'destructive'}>
-                        {socio.activo ? 'Activo' : 'Inactivo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button size="icon" variant="ghost" asChild>
-                          <Link to={`/socios/${socio.id}`}>
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => handleEdit(socio)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" onClick={() => setDeleteDialog(socio)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+          {isLoading ? (
+            <TableSkeleton rows={6} cols={6} />
+          ) : socios.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="No se encontraron socios"
+              description={debouncedSearch ? 'No hay resultados para tu busqueda.' : 'Todavia no hay socios registrados.'}
+              action={!debouncedSearch ? { label: 'Crear Socio', onClick: () => { resetForm(); setModalOpen(true) } } : undefined}
+            />
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>DNI</TableHead>
+                      <TableHead className="hidden md:table-cell">Email</TableHead>
+                      <TableHead className="hidden sm:table-cell">Telefono</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {socios.map((socio) => (
+                      <TableRow key={socio.id}>
+                        <TableCell className="font-medium">
+                          {socio.nombre} {socio.apellido}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{socio.dni}</TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground">{socio.email}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-muted-foreground">{socio.telefono || '-'}</TableCell>
+                        <TableCell>
+                          <Badge variant={socio.activo ? 'default' : 'destructive'}>
+                            {socio.activo ? 'Activo' : 'Inactivo'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-0.5">
+                            <Button size="icon" variant="ghost" asChild className="h-8 w-8">
+                              <Link to={`/socios/${socio.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(socio)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDeleteDialog(socio)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {pagination && (
+                <Pagination
+                  page={pagination.page}
+                  pages={pagination.pages}
+                  total={pagination.total}
+                  onPageChange={setPage}
+                />
               )}
-            </TableBody>
-          </Table>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -235,7 +255,7 @@ export default function Socios() {
                 <Input id="fechaNacimiento" type="date" {...register('fechaNacimiento')} />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
               <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); resetForm() }}>
                 Cancelar
               </Button>
@@ -253,14 +273,14 @@ export default function Socios() {
             <DialogTitle>Dar de baja socio</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Estas seguro que deseas dar de baja a {deleteDialog?.nombre} {deleteDialog?.apellido}?
+            Estas seguro que deseas dar de baja a <strong>{deleteDialog?.nombre} {deleteDialog?.apellido}</strong>? Esta accion no se puede deshacer.
           </p>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setDeleteDialog(null)}>
               Cancelar
             </Button>
             <Button variant="destructive" onClick={() => deleteMutation.mutate(deleteDialog.id)}>
-              Confirmar
+              Dar de baja
             </Button>
           </DialogFooter>
         </DialogContent>

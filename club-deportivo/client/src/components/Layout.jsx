@@ -33,8 +33,10 @@ export default function Layout() {
     navigate('/login')
   }
 
+  const currentPage = navItems.find((item) => location.pathname.startsWith(item.path))?.label
+
   return (
-    <div className="flex h-screen bg-muted/40">
+    <div className="flex h-dvh bg-muted/40">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/50 lg:hidden"
@@ -44,7 +46,7 @@ export default function Layout() {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 w-64 transform border-r bg-background shadow-sm transition-transform lg:static lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-30 w-64 transform border-r bg-background shadow-sm transition-transform duration-200 lg:static lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
@@ -79,7 +81,7 @@ export default function Layout() {
           </nav>
 
           <div className="border-t px-3 py-4">
-            <div className="mb-3 px-3 text-sm text-muted-foreground">
+            <div className="mb-3 truncate px-3 text-sm text-muted-foreground">
               {user?.email}
             </div>
             <Button
@@ -95,12 +97,15 @@ export default function Layout() {
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-between border-b bg-background px-6 py-4">
-          <Button size="icon" variant="ghost" onClick={toggleSidebar} className="lg:hidden">
-            <Menu className="h-6 w-6" />
+        <header className="flex items-center gap-3 border-b bg-background px-4 py-3 sm:px-6 sm:py-4">
+          <Button size="icon" variant="ghost" onClick={toggleSidebar} className="lg:hidden shrink-0">
+            <Menu className="h-5 w-5" />
           </Button>
+          {currentPage && (
+            <span className="text-sm font-medium text-muted-foreground lg:hidden">{currentPage}</span>
+          )}
           <div className="ml-auto">
-            <span className="text-sm text-muted-foreground">
+            <span className="hidden text-xs text-muted-foreground sm:block sm:text-sm">
               {new Date().toLocaleDateString('es-AR', {
                 weekday: 'long',
                 year: 'numeric',
@@ -111,7 +116,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Outlet />
         </main>
       </div>
