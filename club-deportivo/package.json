@@ -2,6 +2,7 @@
   "name": "club-deportivo",
   "private": true,
   "version": "1.0.0",
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client dev\"",
     "build": "pnpm -F client build",
