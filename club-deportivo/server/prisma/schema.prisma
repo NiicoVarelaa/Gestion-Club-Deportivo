@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Socio {
+  id              String        @id @default(uuid())
+  dni             String        @unique
+  nombre          String
+  apellido        String
+  email           String        @unique
+  telefono        String?
+  fechaNacimiento DateTime?
+  fechaAlta       DateTime      @default(now())
+  activo          Boolean       @default(true)
+  supabaseUserId  String?       @unique
+
+  inscripciones   Inscripcion[]
+  pagos           Pago[]
+
+  @@index([activo])
+  @@index([dni])
+}
+
+model Deporte {
+  id           String        @id @default(uuid())
+  nombre       String        @unique
+  descripcion  String?
+  cuotaMensual Decimal       @db.Decimal(10, 2)
+  activo       Boolean       @default(true)
+
+  inscripciones Inscripcion[]
+  pagos         Pago[]
+}
+
+model Inscripcion {
+  id              String    @id @default(uuid())
+  socioId         String
+  deporteId       String
+  fechaInscripcion DateTime @default(now())
+  fechaBaja       DateTime?
+  activo          Boolean   @default(true)
+
+  socio           Socio     @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  deporte         Deporte   @relation(fields: [deporteId], references: [id])
+
+  @@unique([socioId, deporteId])
+  @@index([activo])
+}
+
+model Pago {
+  id         String   @id @default(uuid())
+  socioId    String
+  deporteId  String
+  mes        Int
+  anio       Int
+  monto      Decimal  @db.Decimal(10, 2)
+  fechaPago  DateTime?
+  estado     EstadoPago @default(PENDIENTE)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  socio      Socio    @relation(fields: [socioId], references: [id], onDelete: Cascade)
+  deporte    Deporte  @relation(fields: [deporteId], references: [id])
+
+  @@unique([socioId, deporteId, mes, anio])
+  @@index([estado])
+  @@index([mes, anio])
+}
+
+enum EstadoPago {
+  PAGADO
+  PENDIENTE
+  VENCIDO
+}
