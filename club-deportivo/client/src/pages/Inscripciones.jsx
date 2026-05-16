@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { inscripcionesService, sociosService, deportesService } from '../services'
 import { inscripcionSchema } from '../schemas'
-import { Plus, Trash2, User, Trophy, FileText } from 'lucide-react'
+import { Plus, Trash2, User, Trophy, FileText, FileDown } from 'lucide-react'
 import { formatDate } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Label } from '../components/ui/label'
@@ -29,6 +29,7 @@ import {
 import { TableSkeleton } from '../components/Skeleton'
 import Pagination from '../components/Pagination'
 import EmptyState from '../components/EmptyState'
+import { exportToPDF, exportToExcel, inscripcionesExportColumns, formatInscripcionForExport } from '../lib/export'
 
 const selectStyles = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 
@@ -94,6 +95,20 @@ export default function Inscripciones() {
   const pagination = inscripciones?.pagination
   const total = pagination?.total ?? list.length
 
+  const handleExportPDF = () => {
+    const cols = inscripcionesExportColumns()
+    const rows = list.map(formatInscripcionForExport)
+    exportToPDF({ title: 'Reporte de Inscripciones', columns: cols, rows, filename: 'inscripciones' })
+    toast.success('PDF exportado correctamente')
+  }
+
+  const handleExportExcel = () => {
+    const cols = inscripcionesExportColumns()
+    const rows = list.map(formatInscripcionForExport)
+    exportToExcel({ columns: cols, rows, filename: 'inscripciones' })
+    toast.success('Excel exportado correctamente')
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -101,10 +116,20 @@ export default function Inscripciones() {
           <h1 className="text-2xl font-bold">Inscripciones</h1>
           <p className="text-muted-foreground">{total} inscripciones activas</p>
         </div>
-        <Button onClick={() => { reset(); setModalOpen(true) }} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4" />
-          Nueva Inscripcion
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={list.length === 0}>
+            <FileDown className="h-4 w-4" />
+            PDF
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportExcel} disabled={list.length === 0}>
+            <FileDown className="h-4 w-4" />
+            Excel
+          </Button>
+          <Button onClick={() => { reset(); setModalOpen(true) }} className="w-full sm:w-auto">
+            <Plus className="h-4 w-4" />
+            Nueva Inscripcion
+          </Button>
+        </div>
       </div>
 
       <Card>

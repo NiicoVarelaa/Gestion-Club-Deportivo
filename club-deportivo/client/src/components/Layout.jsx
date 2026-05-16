@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
+import { useTheme } from './ThemeProvider'
 import {
   LayoutDashboard,
   Users,
@@ -10,9 +11,15 @@ import {
   LogOut,
   Menu,
   X,
+  Moon,
+  Sun,
+  UserCircle,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { Button } from './ui/button'
+import { Badge } from './ui/badge'
+import { useQuery } from '@tanstack/react-query'
+import { pagosService } from '../services'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,6 +34,13 @@ export default function Layout() {
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
   const { sidebarOpen, toggleSidebar, closeSidebar } = useUIStore()
+  const { theme, toggleTheme } = useTheme()
+
+  const { data: dashData } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: () => pagosService.getDashboard().then((res) => res.data),
+    staleTime: 1000 * 60,
+  })
 
   const handleLogout = async () => {
     await logout()
@@ -74,13 +88,26 @@ export default function Layout() {
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {item.path === '/pagos' && dashData?.pagosVencidos > 0 && (
+                    <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0">
+                      {dashData.pagosVencidos}
+                    </Badge>
+                  )}
                 </Link>
               )
             })}
           </nav>
 
           <div className="border-t px-3 py-4">
+            <Link
+              to="/perfil"
+              onClick={closeSidebar}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 mb-3 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+            >
+              <UserCircle className="h-5 w-5" />
+              Mi Perfil
+            </Link>
             <div className="mb-3 truncate px-3 text-sm text-muted-foreground">
               {user?.email}
             </div>
@@ -104,7 +131,10 @@ export default function Layout() {
           {currentPage && (
             <span className="text-sm font-medium text-muted-foreground lg:hidden">{currentPage}</span>
           )}
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Button size="icon" variant="ghost" onClick={toggleTheme} className="h-9 w-9" title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}>
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
             <span className="hidden text-xs text-muted-foreground sm:block sm:text-sm">
               {new Date().toLocaleDateString('es-AR', {
                 weekday: 'long',

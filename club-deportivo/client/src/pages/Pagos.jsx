@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { pagosService, sociosService, deportesService } from '../services'
 import { pagoSchema } from '../schemas'
-import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard } from 'lucide-react'
+import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard, FileDown } from 'lucide-react'
 import { formatCurrency, MESES } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -30,6 +30,7 @@ import {
 import { TableSkeleton } from '../components/Skeleton'
 import Pagination from '../components/Pagination'
 import EmptyState from '../components/EmptyState'
+import { exportToPDF, exportToExcel, pagosExportColumns, formatPagoForExport } from '../lib/export'
 
 const selectStyles = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 
@@ -137,6 +138,20 @@ export default function Pagos() {
   const pagination = pagosData?.pagination
   const total = pagination?.total ?? pagos.length
 
+  const handleExportPDF = () => {
+    const cols = pagosExportColumns()
+    const rows = pagos.map(formatPagoForExport)
+    exportToPDF({ title: 'Reporte de Pagos', columns: cols, rows, filename: 'pagos' })
+    toast.success('PDF exportado correctamente')
+  }
+
+  const handleExportExcel = () => {
+    const cols = pagosExportColumns()
+    const rows = pagos.map(formatPagoForExport)
+    exportToExcel({ columns: cols, rows, filename: 'pagos' })
+    toast.success('Excel exportado correctamente')
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -145,6 +160,14 @@ export default function Pagos() {
           <p className="text-muted-foreground">Gestion de cuotas y pagos</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={pagos.length === 0}>
+            <FileDown className="h-4 w-4" />
+            PDF
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportExcel} disabled={pagos.length === 0}>
+            <FileDown className="h-4 w-4" />
+            Excel
+          </Button>
           <Button variant="secondary" onClick={() => generateMutation.mutate()} size="sm">
             <RefreshCw className="h-4 w-4" />
             Generar Cuotas

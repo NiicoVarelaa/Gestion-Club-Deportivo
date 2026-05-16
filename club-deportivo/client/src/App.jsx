@@ -9,6 +9,7 @@ import Deportes from './pages/Deportes'
 import Inscripciones from './pages/Inscripciones'
 import Pagos from './pages/Pagos'
 import SocioDetail from './pages/SocioDetail'
+import Profile from './pages/Profile'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuthStore()
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="deportes" element={<Deportes />} />
         <Route path="inscripciones" element={<Inscripciones />} />
         <Route path="pagos" element={<Pagos />} />
+        <Route path="perfil" element={<Profile />} />
       </Route>
     </Routes>
   )
