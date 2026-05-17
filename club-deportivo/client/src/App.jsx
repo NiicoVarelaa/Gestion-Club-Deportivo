@@ -1,19 +1,28 @@
-import { useEffect } from 'react'
+import { useEffect, Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import Layout from './components/Layout'
 import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import Socios from './pages/Socios'
-import Deportes from './pages/Deportes'
-import Inscripciones from './pages/Inscripciones'
-import Pagos from './pages/Pagos'
-import SocioDetail from './pages/SocioDetail'
-import Profile from './pages/Profile'
+
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Socios = lazy(() => import('./pages/Socios'))
+const Deportes = lazy(() => import('./pages/Deportes'))
+const Inscripciones = lazy(() => import('./pages/Inscripciones'))
+const Pagos = lazy(() => import('./pages/Pagos'))
+const SocioDetail = lazy(() => import('./pages/SocioDetail'))
+const Profile = lazy(() => import('./pages/Profile'))
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center py-16">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    </div>
+  )
+}
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuthStore()
-  if (loading) return <div className="flex h-screen items-center justify-center">Cargando...</div>
+  if (loading) return <PageLoader />
   if (!user) return <Navigate to="/login" />
   return children
 }
@@ -37,13 +46,13 @@ export default function App() {
         }
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="socios" element={<Socios />} />
-        <Route path="socios/:id" element={<SocioDetail />} />
-        <Route path="deportes" element={<Deportes />} />
-        <Route path="inscripciones" element={<Inscripciones />} />
-        <Route path="pagos" element={<Pagos />} />
-        <Route path="perfil" element={<Profile />} />
+        <Route path="dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
+        <Route path="socios" element={<Suspense fallback={<PageLoader />}><Socios /></Suspense>} />
+        <Route path="socios/:id" element={<Suspense fallback={<PageLoader />}><SocioDetail /></Suspense>} />
+        <Route path="deportes" element={<Suspense fallback={<PageLoader />}><Deportes /></Suspense>} />
+        <Route path="inscripciones" element={<Suspense fallback={<PageLoader />}><Inscripciones /></Suspense>} />
+        <Route path="pagos" element={<Suspense fallback={<PageLoader />}><Pagos /></Suspense>} />
+        <Route path="perfil" element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>} />
       </Route>
     </Routes>
   )
