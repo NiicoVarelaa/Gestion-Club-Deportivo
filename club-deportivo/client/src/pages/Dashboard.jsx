@@ -22,10 +22,12 @@ const statsCards = [
 const PIE_COLORS = ['#16a34a', '#d97706', '#dc2626']
 
 export default function Dashboard() {
-  const { data, isLoading, isError } = useQuery({
+  const { data: dashboardResponse, isLoading, isError } = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => pagosService.getDashboard().then((res) => res.data),
   })
+
+  const data = dashboardResponse?.data
 
   if (isLoading) {
     return (

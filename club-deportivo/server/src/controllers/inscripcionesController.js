@@ -4,18 +4,48 @@ import { createInscripcionSchema } from '../utils/validations.js';
 export async function getInscripciones(req, res, next) {
   try {
     const supabase = getSupabase();
-    let query = supabase
+    const { page = 1, limit = 10 } = req.query;
+    const from = (parseInt(page) - 1) * parseInt(limit);
+    const to = from + parseInt(limit) - 1;
+
+    const { data, count, error } = await supabase
       .from('Inscripcion')
-      .select('*, Socio(*), Deporte(*)')
+      .select('*', { count: 'exact' })
       .eq('activo', true)
-      .order('fechaInscripcion', { ascending: false });
+      .order('fechaInscripcion', { ascending: false })
+      .range(from, to);
 
-    if (req.query.socioId) query = query.eq('socioId', req.query.socioId);
-    if (req.query.deporteId) query = query.eq('deporteId', req.query.deporteId);
-
-    const { data, error } = await query;
     if (error) throw error;
-    res.json({ data: data || [] });
+
+    const list = data || [];
+
+    if (list.length > 0) {
+      const socioIds = [...new Set(list.map((i) => i.socioId))];
+      const deporteIds = [...new Set(list.map((i) => i.deporteId))];
+
+      const [{ data: socios }, { data: deportes }] = await Promise.all([
+        supabase.from('Socio').select('*').in('id', socioIds),
+        supabase.from('Deporte').select('*').in('id', deporteIds),
+      ]);
+
+      const socioMap = Object.fromEntries((socios || []).map((s) => [s.id, s]));
+      const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+
+      for (const insc of list) {
+        insc.socio = socioMap[insc.socioId] || null;
+        insc.deporte = deporteMap[insc.deporteId] || null;
+      }
+    }
+
+    res.json({
+      data: list,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: count || 0,
+        pages: Math.ceil((count || 0) / parseInt(limit)),
+      },
+    });
   } catch (err) {
     next(err);
   }
@@ -34,7 +64,7 @@ export async function createInscripcion(req, res, next) {
       .single();
 
     if (existing?.activo) {
-      return res.status(409).json({ error: 'Socio already enrolled in this sport' });
+      return res.status(409).json({ error: 'El socio ya esta inscripto en este deporte' });
     }
 
     if (existing && !existing.activo) {
@@ -42,21 +72,21 @@ export async function createInscripcion(req, res, next) {
         .from('Inscripcion')
         .update({ activo: true, fechaBaja: null })
         .eq('id', existing.id)
-        .select('*, Socio(*), Deporte(*)')
+        .select()
         .single();
 
       if (error) throw error;
-      return res.status(200).json({ data, message: 'Re-enrollment successful' });
+      return res.status(200).json({ data, message: 'Reinscripcion exitosa' });
     }
 
     const { data, error } = await supabase
       .from('Inscripcion')
       .insert([validated])
-      .select('*, Socio(*), Deporte(*)')
+      .select()
       .single();
 
     if (error) throw error;
-    res.status(201).json({ data, message: 'Inscription created successfully' });
+    res.status(201).json({ data, message: 'Inscripcion creada exitosamente' });
   } catch (err) {
     next(err);
   }
@@ -74,7 +104,7 @@ export async function cancelInscripcion(req, res, next) {
       .single();
 
     if (error) throw error;
-    res.json({ data, message: 'Inscription cancelled successfully' });
+    res.json({ data, message: 'Inscripcion cancelada exitosamente' });
   } catch (err) {
     next(err);
   }

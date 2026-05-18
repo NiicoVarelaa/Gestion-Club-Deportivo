@@ -10,7 +10,7 @@ export async function getPagos(req, res, next) {
 
     let query = supabase
       .from('Pago')
-      .select('*, Socio(*), Deporte(*)', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .order('anio', { ascending: false })
       .order('mes', { ascending: false })
       .range(from, to);
@@ -23,8 +23,28 @@ export async function getPagos(req, res, next) {
     const { data, count, error } = await query;
     if (error) throw error;
 
+    const list = data || [];
+
+    if (list.length > 0) {
+      const socioIds = [...new Set(list.map((p) => p.socioId))];
+      const deporteIds = [...new Set(list.map((p) => p.deporteId))];
+
+      const [{ data: socios }, { data: deportes }] = await Promise.all([
+        supabase.from('Socio').select('*').in('id', socioIds),
+        supabase.from('Deporte').select('*').in('id', deporteIds),
+      ]);
+
+      const socioMap = Object.fromEntries((socios || []).map((s) => [s.id, s]));
+      const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+
+      for (const pago of list) {
+        pago.socio = socioMap[pago.socioId] || null;
+        pago.deporte = deporteMap[pago.deporteId] || null;
+      }
+    }
+
     res.json({
-      data: data || [],
+      data: list,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -83,13 +103,17 @@ export async function getDeudasBySocio(req, res, next) {
 
     const { data: inscripciones } = await supabase
       .from('Inscripcion')
-      .select('*, Deporte(*)')
+      .select('*')
       .eq('socioId', socioId)
       .eq('activo', true);
 
     if (!inscripciones?.length) {
       return res.json({ data: { socioId, deudasPorDeporte: [], totalDeuda: 0, totalMesesPendientes: 0 } });
     }
+
+    const deporteIds = [...new Set(inscripciones.map((i) => i.deporteId))];
+    const { data: deportes } = await supabase.from('Deporte').select('*').in('id', deporteIds);
+    const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
 
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
@@ -99,6 +123,9 @@ export async function getDeudasBySocio(req, res, next) {
     let totalDeuda = 0;
 
     for (const inscripcion of inscripciones) {
+      const deporte = deporteMap[inscripcion.deporteId];
+      if (!deporte) continue;
+
       const mesInscripcion = new Date(inscripcion.fechaInscripcion).getMonth() + 1;
       const anioInscripcion = new Date(inscripcion.fechaInscripcion).getFullYear();
 
@@ -121,7 +148,7 @@ export async function getDeudasBySocio(req, res, next) {
           mesesPendientes.push({
             mes,
             anio,
-            monto: parseFloat(inscripcion.Deporte.cuotaMensual),
+            monto: parseFloat(deporte.cuotaMensual),
             estado: isVencido ? 'VENCIDO' : 'PENDIENTE',
           });
         }
@@ -136,8 +163,8 @@ export async function getDeudasBySocio(req, res, next) {
       if (mesesPendientes.length > 0) {
         deudasPorDeporte.push({
           deporteId: inscripcion.deporteId,
-          deporteNombre: inscripcion.Deporte.nombre,
-          cuotaMensual: parseFloat(inscripcion.Deporte.cuotaMensual),
+          deporteNombre: deporte.nombre,
+          cuotaMensual: parseFloat(deporte.cuotaMensual),
           mesesPendientes,
           totalDeuda: deudaDeporte,
           cantidadMeses: mesesPendientes.length,
@@ -167,12 +194,23 @@ export async function generateMonthlyPayments(req, res, next) {
 
     const { data: inscripciones } = await supabase
       .from('Inscripcion')
-      .select('*, Deporte(*)')
+      .select('*')
       .eq('activo', true);
+
+    if (!inscripciones?.length) {
+      return res.json({ message: `No hay inscripciones activas para generar cuotas`, created: 0 });
+    }
+
+    const deporteIds = [...new Set(inscripciones.map((i) => i.deporteId))];
+    const { data: deportes } = await supabase.from('Deporte').select('*').in('id', deporteIds);
+    const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
 
     let created = 0;
 
-    for (const inscripcion of inscripciones || []) {
+    for (const inscripcion of inscripciones) {
+      const deporte = deporteMap[inscripcion.deporteId];
+      if (!deporte) continue;
+
       const { data: existing } = await supabase
         .from('Pago')
         .select('*')
@@ -188,14 +226,13 @@ export async function generateMonthlyPayments(req, res, next) {
           deporteId: inscripcion.deporteId,
           mes,
           anio,
-          monto: inscripcion.Deporte.cuotaMensual,
+          monto: deporte.cuotaMensual,
           estado: 'PENDIENTE',
         }]);
         created++;
       }
     }
 
-    // Update vencidos
     const { data: pagosPendientes } = await supabase
       .from('Pago')
       .select('id, mes, anio')
@@ -237,14 +274,11 @@ export async function getDashboardStats(req, res, next) {
       .from('Pago')
       .select('monto')
       .eq('mes', mes)
-      .eq('anio', anio)
       .eq('estado', 'PAGADO');
 
     const { count: pagosPendientes } = await supabase
       .from('Pago')
       .select('*', { count: 'exact', head: true })
-      .eq('mes', mes)
-      .eq('anio', anio)
       .eq('estado', 'PENDIENTE');
 
     const { count: pagosVencidos } = await supabase

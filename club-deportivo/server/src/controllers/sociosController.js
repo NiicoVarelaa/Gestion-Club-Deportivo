@@ -21,10 +21,25 @@ export async function getSocios(req, res, next) {
     const inscripcionesPromises = (data || []).map(async (socio) => {
       const { data: insc } = await supabase
         .from('Inscripcion')
-        .select('*, Deporte(*)')
+        .select('*')
         .eq('socioId', socio.id)
         .eq('activo', true);
-      return { ...socio, inscripciones: insc || [] };
+
+      const list = insc || [];
+      if (list.length > 0) {
+        const deporteIds = [...new Set(list.map((i) => i.deporteId))];
+        const { data: deportes } = await supabase
+          .from('Deporte')
+          .select('*')
+          .in('id', deporteIds);
+
+        const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+        for (const i of list) {
+          i.deporte = deporteMap[i.deporteId] || null;
+        }
+      }
+
+      return { ...socio, inscripciones: list };
     });
 
     const sociosWithInscripciones = await Promise.all(inscripcionesPromises);
@@ -57,14 +72,28 @@ export async function getSocioById(req, res, next) {
 
     const { data: inscripciones } = await supabase
       .from('Inscripcion')
-      .select('*, Deporte(*)')
+      .select('*')
       .eq('socioId', socio.id)
       .eq('activo', true);
+
+    const list = inscripciones || [];
+    if (list.length > 0) {
+      const deporteIds = [...new Set(list.map((i) => i.deporteId))];
+      const { data: deportes } = await supabase
+        .from('Deporte')
+        .select('*')
+        .in('id', deporteIds);
+
+      const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+      for (const i of list) {
+        i.deporte = deporteMap[i.deporteId] || null;
+      }
+    }
 
     res.json({
       data: {
         ...socio,
-        inscripciones: inscripciones || [],
+        inscripciones: list,
       },
     });
   } catch (err) {

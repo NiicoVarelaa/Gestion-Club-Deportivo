@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { pagosService, sociosService, deportesService } from '../services'
 import { pagoSchema } from '../schemas'
 import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard, FileDown } from 'lucide-react'
-import { formatCurrency, MESES } from '../lib/utils'
+import { formatCurrency, formatDate, MESES } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -136,7 +136,6 @@ export default function Pagos() {
   const sociosList = socios?.data || []
   const deportesList = deportes?.data || []
   const pagination = pagosData?.pagination
-  const total = pagination?.total ?? pagos.length
 
   const handleExportPDF = () => {
     const cols = pagosExportColumns()

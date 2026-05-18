@@ -12,16 +12,19 @@ import EmptyState from '../components/EmptyState'
 export default function SocioDetail() {
   const { id } = useParams()
 
-  const { data: socioData, isLoading, isError } = useQuery({
+  const { data: socioResponse, isLoading, isError } = useQuery({
     queryKey: ['socio', id],
     queryFn: () => sociosService.getById(id).then((res) => res.data),
   })
 
-  const { data: deudasData } = useQuery({
+  const { data: deudasResponse } = useQuery({
     queryKey: ['deudas', id],
     queryFn: () => pagosService.getDeudas(id).then((res) => res.data),
     enabled: !!id,
   })
+
+  const socioData = socioResponse?.data
+  const deudasData = deudasResponse?.data
 
   if (isLoading) return <DetailSkeleton />
   if (isError || !socioData) return (
@@ -118,7 +121,7 @@ export default function SocioDetail() {
         </Card>
       </div>
 
-      {deudas.deudasPorDeporte.length > 0 && (
+      {deudas?.deudasPorDeporte?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Detalle de Deudas</CardTitle>

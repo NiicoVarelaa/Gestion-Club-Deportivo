@@ -18,7 +18,7 @@ const profileSchema = z.object({
 })
 
 export default function Profile() {
-  const { user, session } = useAuthStore()
+  const { user } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [passwordData, setPasswordData] = useState({ password: '', confirm: '' })
