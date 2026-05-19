@@ -57,8 +57,8 @@ export default function Registro() {
   }
 
   const fields = [
-    { name: 'nombre', label: 'Nombre', placeholder: 'Juan', type: 'text', col: 'half' },
-    { name: 'apellido', label: 'Apellido', placeholder: 'Pérez', type: 'text', col: 'half' },
+    { name: 'nombre', label: 'Nombre', placeholder: 'Nicolás', type: 'text', col: 'full' },
+    { name: 'apellido', label: 'Apellido', placeholder: 'Varela', type: 'text', col: 'full' },
     { name: 'dni', label: 'DNI', placeholder: '12345678', type: 'text', col: 'full' },
     { name: 'email', label: 'Email', placeholder: 'juan@email.com', type: 'email', col: 'full' },
     { name: 'telefono', label: 'Teléfono', placeholder: '1123456789', type: 'text', col: 'full' },

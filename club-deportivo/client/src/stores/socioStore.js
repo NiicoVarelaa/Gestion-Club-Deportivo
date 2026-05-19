@@ -1,54 +1,43 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
+import api from '@/lib/api'
 
-export const useSocioStore = create((set) => ({
+export const useSocioStore = create((set, get) => ({
   socio: null,
   deportes: [],
   pagos: [],
   deuda: null,
   loading: false,
   error: null,
-
-  login: async (email, password) => {
-    set({ loading: true, error: null });
-    try {
-      const { default: api } = await import('@/lib/api');
-      const { data } = await api.post('/auth/login', { email, password });
-      localStorage.setItem('socio_token', data.session?.access_token || '');
-      set({ loading: false });
-      return data;
-    } catch {
-      const msg = 'Error de autenticacion';
-      set({ error: msg, loading: false });
-    }
-  },
+  initialized: false,
 
   fetchPortalData: async () => {
-    set({ loading: true, error: null });
+    if (get().initialized) return
+    set({ loading: true, error: null })
     try {
-      const { default: api } = await import('@/lib/api');
-      const token = localStorage.getItem('socio_token');
+      const token = localStorage.getItem('socio_token')
       if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
       }
-      const { data } = await api.get('/portal/me');
+      const { data } = await api.get('/portal/me')
       set({
         socio: data.socio,
         deportes: data.deportes,
         pagos: data.pagos,
         deuda: data.deuda,
         loading: false,
-      });
+        initialized: true,
+      })
     } catch {
-      set({ error: 'Error al cargar datos del portal', loading: false });
+      set({ error: 'Error al cargar datos del portal', loading: false })
     }
   },
 
   logout: () => {
-    localStorage.removeItem('socio_token');
-    set({ socio: null, deportes: [], pagos: [], deuda: null, error: null });
+    localStorage.removeItem('socio_token')
+    set({ socio: null, deportes: [], pagos: [], deuda: null, error: null, initialized: false })
   },
 
   clearError: () => set({ error: null }),
-}));
+}))
 
-export default useSocioStore;
+export default useSocioStore

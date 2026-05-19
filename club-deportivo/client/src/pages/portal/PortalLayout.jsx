@@ -18,7 +18,7 @@ const navItems = [
   { to: '/portal/perfil', label: 'Perfil', icon: User },
 ]
 
-function NavLinks({ location, deuda, closeSidebar }) {
+function NavLinks({ location, deuda }) {
   return (
     <>
       {navItems.map(({ to, label, icon: Icon }) => {
@@ -27,7 +27,6 @@ function NavLinks({ location, deuda, closeSidebar }) {
           <Link
             key={to}
             to={to}
-            onClick={closeSidebar}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-primary/10 text-primary'
@@ -80,7 +79,7 @@ export default function PortalLayout() {
                   <span className="font-bold">Club Deportivo</span>
                 </div>
                 <nav className="flex flex-col gap-1">
-                  <NavLinks location={location} deuda={deuda} closeSidebar={() => {}} />
+                  <NavLinks location={location} deuda={deuda} />
                 </nav>
               </SheetContent>
             </Sheet>
@@ -94,7 +93,7 @@ export default function PortalLayout() {
           </div>
 
           <nav className="hidden md:flex items-center gap-1">
-            <NavLinks location={location} deuda={deuda} closeSidebar={() => {}} />
+            <NavLinks location={location} deuda={deuda} />
           </nav>
 
           <div className="flex items-center gap-3">

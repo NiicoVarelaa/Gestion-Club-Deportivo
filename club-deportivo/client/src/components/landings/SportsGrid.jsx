@@ -71,9 +71,9 @@ function FeaturedCard({ sport, deporte, index }) {
       className="group relative bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30"
     >
       {/* Header con gradiente */}
-      <div className={`relative bg-gradient-to-br ${sport.gradient} p-8 pb-12`}>
+      <div className={`relative bg-gradient-to-br ${sport.gradient} p-8 pb-16 rounded-t-[2rem]`}>
         {/* Patrón decorativo */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 rounded-t-[2rem] overflow-hidden">
           <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id={`pattern-${index}`} width="40" height="40" patternUnits="userSpaceOnUse">
@@ -102,26 +102,16 @@ function FeaturedCard({ sport, deporte, index }) {
             {deporte?.descripcion || 'Entrená, competí y disfrutá con nosotros.'}
           </p>
         </div>
-
-        {/* Curva inferior */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 400 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path
-              d="M0 40L400 40V0C400 0 300 40 200 40C100 40 0 0 0 0V40Z"
-              className="fill-white dark:fill-gray-900"
-            />
-          </svg>
-        </div>
       </div>
 
       {/* Contenido */}
-      <div className="px-8 -mt-4 pb-8 space-y-6">
+      <div className="px-8 pt-6 pb-8 space-y-6">
         {/* Precio */}
-        <div className="flex items-end gap-2">
-          <span className={`text-4xl font-extrabold ${sport.accent}`}>
-            ${formatCurrency(cuota)}
+        <div className="flex items-baseline gap-1">
+          <span className={`text-3xl font-extrabold tracking-tight ${sport.accent}`}>
+            {formatCurrency(cuota)}
           </span>
-          <span className="text-muted-foreground text-sm mb-1">/mes</span>
+          <span className="text-muted-foreground text-xs">/mes</span>
         </div>
 
         {/* Features */}
@@ -137,7 +127,7 @@ function FeaturedCard({ sport, deporte, index }) {
         </div>
 
         {/* Info extra */}
-        <div className="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-4 pt-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-4 h-4" />
             <span>{sport.players}</span>
@@ -169,11 +159,11 @@ function FeaturedCard({ sport, deporte, index }) {
 export default function SportsGrid() {
   const { data: deportes, isLoading } = useQuery({
     queryKey: ['deportes', 'public'],
-    queryFn: () => deportesService.getAll({ activo: true }),
+    queryFn: () => deportesService.getAll({ activo: true }).then((res) => res.data.data || []),
   })
 
   const getDeporte = (key) => {
-    if (!deportes) return null
+    if (!deportes || deportes.length === 0) return null
     return deportes.find((d) => d.nombre.toLowerCase().includes(key))
   }
 
