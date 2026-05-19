@@ -9,15 +9,12 @@
 [![Prisma](https://img.shields.io/badge/Prisma-6.5-2D3748?logo=prisma)](https://www.prisma.io/)
 [![pnpm](https://img.shields.io/badge/pnpm-11.1-F69220?logo=pnpm)](https://pnpm.io/)
 [![Zod](https://img.shields.io/badge/Zod-3.24-3E67B3)](https://zod.dev/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?logo=framer)](https://www.framer.com/motion/)
 [![Render](https://img.shields.io/badge/Render-Backend-46E3B7?logo=render)](https://render.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?logo=vercel)](https://vercel.com/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest)](https://vitest.dev/)
 
-Sistema full-stack para administrar un club deportivo. Permite gestionar socios, deportes, inscripciones, pagos de cuotas mensuales y ofrece un dashboard con estadisticas en tiempo real.
-
-<img src="./screenshots/dashboard.png" alt="Dashboard" width="800" />
-
-> **Nota:** Agregar tus screenshots en la carpeta `screenshots/` y referenciarlas en este README.
+Sistema full-stack para administrar un club deportivo. Incluye **landing page publica** con animaciones, **registro de socios**, **portal del socio** para consultar deportes y pagos, y **panel de administracion** completo con dashboard, CRUD y estadisticas.
 
 ## Live Demo
 
@@ -30,6 +27,19 @@ Sistema full-stack para administrar un club deportivo. Permite gestionar socios,
 
 ## Funcionalidades
 
+### Publico
+- **Landing page** con hero animado, grilla de disciplinas destacadas (Futbol, Natacion, Basquet) y seccion de beneficios
+- **Formulario de registro** con validacion Zod + React Hook Form, campos en columnas, feedback visual de errores
+- **Animaciones** con Framer Motion: staggered cards, parallax nav, hover effects, scroll-triggered reveals
+
+### Portal del Socio
+- Dashboard personal con estado de cuenta, deportes activos, progreso de pagos y alerta de deudas
+- Vista de mis deportes con fecha de inscripcion y cuota mensual
+- Historial de pagos con estados PAGADO/PENDIENTE/VENCIDO y progreso anual
+- Perfil con datos personales y estado de membresia
+- Navegacion responsive con Sheet (menu lateral) en mobile
+
+### Panel de Administracion
 - Autenticacion completa con Supabase Auth (login/registro/recupero de password) — UI en espanol
 - CRUD de **Socios**, **Deportes**, **Inscripciones** y **Pagos**
 - Busqueda con debounce (300ms), paginacion numerada, skeleton loaders y estados vacios
@@ -40,8 +50,6 @@ Sistema full-stack para administrar un club deportivo. Permite gestionar socios,
 - Tema oscuro persistiendo en `localStorage`
 - Perfil de usuario editable (nombre/apellido/cambio de password)
 - Lazy loading por ruta con `React.lazy` + `Suspense`
-- Validacion de formularios con **Zod** + **React Hook Form**
-- SEO: meta tags, Open Graph, favicon personalizado
 - Totalmente responsive (mobile-first)
 
 ## Arquitectura
@@ -49,18 +57,20 @@ Sistema full-stack para administrar un club deportivo. Permite gestionar socios,
 ```
 ┌─────────────────────────────────────────────────────┐
 │                      Vercel                         │
-│  ┌───────────────────────────────────────────────┐  │
+│  ───────────────────────────────────────────────┐  │
 │  │         React SPA (Vite + pnpm)               │  │
-│  │  Zustand / React Query / React Router / Tailwind │
+│  │  Landing / Portal Socio / Admin Panel         │  │
+│  │  Zustand / React Query / Framer Motion        │  │
 │  └───────────────────┬───────────────────────────┘  │
-└──────────────────────┼──────────────────────────────┘
+──────────────────────┼──────────────────────────────┘
                        │ HTTPS
                        ▼
-┌──────────────────────────────────────────────────────┐
+──────────────────────────────────────────────────────┐
 │                      Render                          │
-│  ┌────────────────────────────────────────────────┐  │
+│  ────────────────────────────────────────────────┐  │
 │  │         Express API (Node.js)                  │  │
-│  │  Prisma ORM / Zod / Morgan / Helmet / CORS     │  │
+│  │  Prisma / Zod / Morgan / Helmet / CORS         │  │
+│  │  Auth + Portal + Admin endpoints               │  │
 │  └────────────────────┬───────────────────────────┘  │
 └───────────────────────┼─────────────────────────────┘
                         │ SQL
@@ -68,7 +78,7 @@ Sistema full-stack para administrar un club deportivo. Permite gestionar socios,
 ┌──────────────────────────────────────────────────────┐
 │                 Supabase (PostgreSQL)                 │
 │        Auth + Base de datos + Row Level Security      │
-└──────────────────────────────────────────────────────┘
+──────────────────────────────────────────────────────┘
 ```
 
 ### Stack Detallado
@@ -83,6 +93,7 @@ Sistema full-stack para administrar un club deportivo. Permite gestionar socios,
 | Frontend    | React 18.3 + Vite 8 + Tailwind CSS 3.4             |
 | Estado      | Zustand 5 + React Query 5                          |
 | Formularios | React Hook Form 7 + `@hookform/resolvers`          |
+| Animaciones | Framer Motion 12                                   |
 | UI          | shadcn/ui + Radix primitives + Lucide React        |
 | Graficos    | Recharts 3.8                                       |
 | Export      | jsPDF 4.2 + xlsx 0.18                              |
@@ -99,29 +110,148 @@ club-deportivo/
 │   │   └── schema.prisma            # Modelo de datos
 │   ├── src/
 │   │   ├── index.js                 # Servidor principal
-│   │   ├── controllers/             # socios, deportes, pagos, auth
-│   │   ├── routes/                  # Definicion de rutas
+│   │   ├── controllers/             # socios, deportes, pagos, auth, portal
+│   │   ├── routes/                  # auth, socios, deportes, pagos, portal
 │   │   ├── middleware/              # autenticacion, errores
 │   │   └── utils/                   # validaciones Zod, Supabase client
-│   └── tests/
+│   ── tests/
 │       └── validations.test.js      # Tests de esquemas Zod
 ├── client/                          # Frontend React
 │   ├── src/
 │   │   ├── main.jsx                 # Entry point
-│   │   ├── App.jsx                  # Router + Layout
-│   │   ├── pages/                   # Dashboard, Socios, Deportes, Pagos, etc.
-│   │   ├── components/              # Layout, Modal, Skeleton, Pagination, etc.
-│   │   │   └── ui/                  # shadcn/ui primitives
-│   │   ├── stores/                  # Zustand (auth, UI)
+│   │   ├── App.jsx                  # Router (public + portal + admin)
+│   │   ├── pages/
+│   │   │   ├── public/              # Landing, Registro
+│   │   │   ├── portal/              # PortalDashboard, PortalPerfil, PortalDeportes, PortalPagos
+│   │   │   └── *.jsx                # Admin pages (Dashboard, Socios, etc.)
+│   │   ├── components/
+│   │   │   ├── landings/            # HeroSection, SportsGrid, BenefitsSection
+│   │   │   ├── ui/                  # shadcn/ui (15 componentes)
+│   │   │   └── *.jsx                # Layout, Modal, Skeleton, etc.
+│   │   ├── stores/                  # authStore, socioStore, uiStore
 │   │   ├── schemas/                 # Zod schemas + tests
-│   │   ├── services/                # API service wrappers
+│   │   ├── services/                # API services (socios, deportes, pagos, public, portal)
 │   │   ├── hooks/                   # useDebounce + tests
 │   │   └── lib/                     # api client, supabase, utils, export
 │   └── public/
-│       └── favicon.svg
+│       ── favicon.svg
 ├── package.json                     # pnpm workspace root + overrides
 ├── pnpm-workspace.yaml
 └── .npmrc
+```
+
+## Rutas
+
+### Publicas
+| Ruta        | Descripcion                          |
+| ----------- | ------------------------------------ |
+| `/`         | Landing page con hero + disciplinas  |
+| `/registro` | Formulario de inscripcion            |
+
+### Portal del Socio (requiere auth)
+| Ruta              | Descripcion                    |
+| ----------------- | ------------------------------ |
+| `/portal`         | Dashboard personal             |
+| `/portal/deportes`| Mis deportes inscriptos        |
+| `/portal/pagos`   | Historial y estado de pagos    |
+| `/portal/perfil`  | Datos personales               |
+
+### Panel de Administracion (requiere auth)
+| Ruta              | Descripcion                    |
+| ----------------- | ------------------------------ |
+| `/login`          | Login de administrador         |
+| `/admin/dashboard`| Dashboard con estadisticas     |
+| `/admin/socios`   | Gestion de socios              |
+| `/admin/deportes` | Gestion de deportes            |
+| `/admin/inscripciones` | Gestion de inscripciones   |
+| `/admin/pagos`    | Gestion de pagos               |
+| `/admin/perfil`   | Perfil del administrador       |
+
+## API Endpoints
+
+### Auth
+| Metodo    | Ruta                     | Descripcion              |
+| --------- | ------------------------ | ------------------------ |
+| `POST`    | `/api/auth/signup`       | Registro admin           |
+| `POST`    | `/api/auth/signup-public`| Registro publico (socio) |
+| `POST`    | `/api/auth/login`        | Login                    |
+| `POST`    | `/api/auth/logout`       | Logout                   |
+
+### Portal del Socio (auth requerida)
+| Metodo    | Ruta              | Descripcion              |
+| --------- | ----------------- | ------------------------ |
+| `GET`     | `/api/portal/me`  | Datos del socio logueado |
+
+### Socios
+| Metodo    | Ruta               | Descripcion      | Query params                    |
+| --------- | ------------------ | ---------------- | ------------------------------- |
+| `GET`     | `/api/socios`      | Listar socios    | `search`, `page`, `limit`       |
+| `GET`     | `/api/socios/:id`  | Detalle de socio | —                               |
+| `POST`    | `/api/socios`      | Crear socio      | —                               |
+| `PUT`     | `/api/socios/:id`  | Actualizar socio | —                               |
+| `DELETE`  | `/api/socios/:id`  | Dar de baja      | —                               |
+
+### Deportes
+| Metodo    | Ruta                 | Descripcion        |
+| --------- | -------------------- | ------------------ |
+| `GET`     | `/api/deportes`      | Listar deportes    |
+| `GET`     | `/api/deportes/:id`  | Detalle de deporte |
+| `POST`    | `/api/deportes`      | Crear deporte      |
+| `PUT`     | `/api/deportes/:id`  | Actualizar deporte |
+| `DELETE`  | `/api/deportes/:id`  | Dar de baja        |
+
+### Inscripciones
+| Metodo    | Ruta                    | Descripcion            |
+| --------- | ----------------------- | ---------------------- |
+| `GET`     | `/api/inscripciones`    | Listar inscripciones   |
+| `POST`    | `/api/inscripciones`    | Inscribir socio        |
+| `DELETE`  | `/api/inscripciones/:id`| Cancelar inscripcion   |
+
+### Pagos
+| Metodo    | Ruta                     | Descripcion              | Query params                |
+| --------- | ------------------------ | ------------------------ | --------------------------- |
+| `GET`     | `/api/pagos`             | Listar pagos             | `socioId`, `estado`, `mes`, `anio` |
+| `POST`    | `/api/pagos`             | Registrar pago           | —                           |
+| `GET`     | `/api/pagos/deudas/:id`  | Deudas de un socio       | —                           |
+| `POST`    | `/api/pagos/generar`     | Generar cuotas del mes   | —                           |
+| `GET`     | `/api/pagos/dashboard`   | Stats del dashboard      | —                           |
+
+## Modelo de Base de Datos
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Socio                                                    │
+│  id | dni | nombre | apellido | email | telefono         │
+│  fechaNacimiento | fechaAlta | activo | supabaseUserId   │
+│                                                           │
+│  hasMany: Inscripcion, Pago                               │
+└───────────────────┬──────────────────────────────────────┘
+                    │
+┌───────────────────▼──────────────┐
+│  Inscripcion                     │
+│  id | socioId | deporteId       │
+│  fechaInscripcion | fechaBaja   │
+│  activo                          │
+│                                  │
+│  belongsTo: Socio, Deporte       │
+└───────────────────┬──────────────┘
+                    │
+┌───────────────────▼──────────────┐
+│  Deporte                         │
+│  id | nombre | descripcion      │
+│  cuotaMensual | activo           │
+│                                  │
+│  hasMany: Inscripcion, Pago      │
+└───────────────────┬──────────────┘
+                    │
+┌───────────────────▼──────────────┐
+│  Pago                            │
+│  id | socioId | deporteId       │
+│  mes | anio | monto              │
+│  fechaPago | estado | metodoPago │
+│                                  │
+│  belongsTo: Socio, Deporte       │
+──────────────────────────────────┘
 ```
 
 ## Desarrollo Local
@@ -213,84 +343,6 @@ pnpm dev
 | Backend    | http://localhost:3000      |
 | API Proxy  | `/api` -> `localhost:3000` |
 
-## API Endpoints
-
-### Socios
-
-| Metodo    | Ruta               | Descripcion      | Query params                    |
-| --------- | ------------------ | ---------------- | ------------------------------- |
-| `GET`     | `/api/socios`      | Listar socios    | `search`, `page`, `limit`       |
-| `GET`     | `/api/socios/:id`  | Detalle de socio | —                               |
-| `POST`    | `/api/socios`      | Crear socio      | —                               |
-| `PUT`     | `/api/socios/:id`  | Actualizar socio | —                               |
-| `DELETE`  | `/api/socios/:id`  | Dar de baja      | —                               |
-
-### Deportes
-
-| Metodo    | Ruta                 | Descripcion        |
-| --------- | -------------------- | ------------------ |
-| `GET`     | `/api/deportes`      | Listar deportes    |
-| `GET`     | `/api/deportes/:id`  | Detalle de deporte |
-| `POST`    | `/api/deportes`      | Crear deporte      |
-| `PUT`     | `/api/deportes/:id`  | Actualizar deporte |
-| `DELETE`  | `/api/deportes/:id`  | Dar de baja        |
-
-### Inscripciones
-
-| Metodo    | Ruta                    | Descripcion            |
-| --------- | ----------------------- | ---------------------- |
-| `GET`     | `/api/inscripciones`    | Listar inscripciones   |
-| `POST`    | `/api/inscripciones`    | Inscribir socio        |
-| `DELETE`  | `/api/inscripciones/:id`| Cancelar inscripcion   |
-
-### Pagos
-
-| Metodo    | Ruta                     | Descripcion              | Query params                |
-| --------- | ------------------------ | ------------------------ | --------------------------- |
-| `GET`     | `/api/pagos`             | Listar pagos             | `socioId`, `estado`, `mes`, `anio` |
-| `POST`    | `/api/pagos`             | Registrar pago           | —                           |
-| `GET`     | `/api/pagos/deudas/:id`  | Deudas de un socio       | —                           |
-| `POST`    | `/api/pagos/generar`     | Generar cuotas del mes   | —                           |
-| `GET`     | `/api/pagos/dashboard`   | Stats del dashboard      | —                           |
-
-## Modelo de Base de Datos
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  Socio                                                    │
-│  id | dni | nombre | apellido | email | telefono         │
-│  fechaNacimiento | fechaAlta | activo | supabaseUserId   │
-│                                                           │
-│  hasMany: Inscripcion, Pago                               │
-└───────────────────┬──────────────────────────────────────┘
-                    │
-┌───────────────────▼──────────────┐
-│  Inscripcion                     │
-│  id | socioId | deporteId       │
-│  fechaInscripcion | fechaBaja   │
-│  activo                          │
-│                                  │
-│  belongsTo: Socio, Deporte       │
-└───────────────────┬──────────────┘
-                    │
-┌───────────────────▼──────────────┐
-│  Deporte                         │
-│  id | nombre | descripcion      │
-│  cuotaMensual | activo           │
-│                                  │
-│  hasMany: Inscripcion, Pago      │
-└───────────────────┬──────────────┘
-                    │
-┌───────────────────▼──────────────┐
-│  Pago                            │
-│  id | socioId | deporteId       │
-│  mes | anio | monto              │
-│  fechaPago | estado | metodoPago │
-│                                  │
-│  belongsTo: Socio, Deporte       │
-└──────────────────────────────────┘
-```
-
 ## Comandos
 
 ```bash
@@ -362,23 +414,31 @@ En el dashboard de Supabase, ir a **Authentication > URL Configuration**:
 
 > Agregar imagenes en la carpeta `screenshots/` y actualizar los paths:
 
-| Pagina        | Screenshot                    |
-| ------------- | ----------------------------- |
-| Dashboard     | `screenshots/dashboard.png`   |
-| Socios        | `screenshots/socios.png`      |
-| Detalle Socio | `screenshots/socio-detail.png`|
-| Deportes      | `screenshots/deportes.png`    |
-| Pagos         | `screenshots/pagos.png`       |
-| Inscripciones | `screenshots/inscripciones.png`|
-| Login         | `screenshots/login.png`       |
-| Mi Perfil     | `screenshots/profile.png`     |
-| Tema Oscuro   | `screenshots/dark-mode.png`   |
+| Pagina              | Screenshot                    |
+| ------------------- | ----------------------------- |
+| Landing             | `screenshots/landing.png`     |
+| Registro            | `screenshots/registro.png`    |
+| Portal Dashboard    | `screenshots/portal.png`      |
+| Portal Deportes     | `screenshots/portal-deportes.png` |
+| Portal Pagos        | `screenshots/portal-pagos.png`|
+| Admin Dashboard     | `screenshots/dashboard.png`   |
+| Socios              | `screenshots/socios.png`      |
+| Detalle Socio       | `screenshots/socio-detail.png`|
+| Deportes            | `screenshots/deportes.png`    |
+| Pagos               | `screenshots/pagos.png`       |
+| Inscripciones       | `screenshots/inscripciones.png`|
+| Login               | `screenshots/login.png`       |
+| Mi Perfil           | `screenshots/profile.png`     |
+| Tema Oscuro         | `screenshots/dark-mode.png`   |
 
 ## Decisiones Tecnicas
 
 - **React 18.3** (no 19): `@supabase/auth-ui-react` no soporta React 19 aun
 - **pnpm 11.1** pineado en `package.json` con `packageManager` para compatibilidad con Vercel
-- **Prisma** como ORM (no `supabase-js` directo) por type-safety y migraciones
+- **Prisma** como ORM por type-safety y migraciones; Supabase para queries runtime
+- **Framer Motion** para animaciones de la landing (staggered reveals, hover effects, parallax nav)
 - **Tema oscuro**: implementacion propia via `ThemeProvider` + `localStorage` (sin libreria externa)
 - **`service_role` key** solo en backend para operaciones protegidas; el frontend usa `anon` key
 - **Lazy loading** en todas las rutas con `React.lazy` + `Suspense` para optimizar bundle size
+- **Portal del socio** separado del admin: mismo auth (Supabase), diferente UI y permisos
+- **Featured sports cards**: 3 disciplinas principales (Futbol, Natacion, Basquet) con datos dinamicos desde la API
