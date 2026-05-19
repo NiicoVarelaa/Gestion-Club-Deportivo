@@ -38,3 +38,29 @@ export const loginSchema = z.object({
   email: z.string().email('Email invalido'),
   password: z.string().min(6, 'Password debe tener al menos 6 caracteres'),
 })
+
+export const registroSchema = z.object({
+  nombre: z.string().min(2, 'Minimo 2 caracteres').max(100),
+  apellido: z.string().min(2, 'Minimo 2 caracteres').max(100),
+  dni: z
+    .string()
+    .min(6, 'DNI debe tener al menos 6 digitos')
+    .max(20)
+    .regex(/^\d+$/, 'DNI debe contener solo numeros'),
+  email: z.string().email('Email invalido'),
+  telefono: z
+    .string()
+    .regex(/^\d{7,15}$/, 'Telefono invalido')
+    .optional()
+    .or(z.literal('')),
+  password: z
+    .string()
+    .min(8, 'Minimo 8 caracteres')
+    .regex(/[A-Z]/, 'Al menos una mayuscula')
+    .regex(/[0-9]/, 'Al menos un numero'),
+})
+
+export const socioLoginSchema = z.object({
+  email: z.string().email('Email invalido'),
+  password: z.string().min(6, 'Minimo 6 caracteres'),
+})

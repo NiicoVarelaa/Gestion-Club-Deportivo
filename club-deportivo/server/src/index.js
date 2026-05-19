@@ -11,6 +11,7 @@ import deportesRoutes from './routes/deportes.js';
 import inscripcionesRoutes from './routes/inscripciones.js';
 import pagosRoutes from './routes/pagos.js';
 import authRoutes from './routes/auth.js';
+import portalRoutes from './routes/portal.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -32,6 +33,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/portal', portalRoutes);
 app.use('/api/socios', sociosRoutes);
 app.use('/api/deportes', deportesRoutes);
 app.use('/api/inscripciones', inscripcionesRoutes);

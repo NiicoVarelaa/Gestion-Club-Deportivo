@@ -37,3 +37,17 @@ export const createPagoSchema = z.object({
     return num;
   }).pipe(z.number().positive()),
 });
+
+export const registroSchema = z.object({
+  nombre: z.string().min(2).max(100),
+  apellido: z.string().min(2).max(100),
+  dni: z.string().min(6).max(20).regex(/^\d+$/, 'DNI debe contener solo numeros'),
+  email: z.string().email(),
+  telefono: z.string().max(20).optional().or(z.literal('')),
+  password: z.string().min(8).regex(/[A-Z]/, 'Al menos una mayuscula').regex(/[0-9]/, 'Al menos un numero'),
+});
+
+export const socioLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});

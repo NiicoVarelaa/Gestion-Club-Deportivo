@@ -1,0 +1,64 @@
+import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+
+export default function HeroSection() {
+  return (
+    <section className="relative min-h-[90vh] flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 60 M 0 0 L 60 60" stroke="white" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero_grid)" />
+        </svg>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-6 py-20 text-center md:text-left md:grid md:grid-cols-2 md:items-center gap-12">
+        <div className="space-y-8 animate-slide-up">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight">
+            Tu club,{' '}
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-400">
+              tu comunidad
+            </span>
+          </h1>
+          <p className="text-lg md:text-xl text-blue-100/80 max-w-lg mx-auto md:mx-0">
+            Entrená, competí y crecé en el club deportivo más completo de la zona. Más de 10 disciplinas y una comunidad que te espera.
+          </p>
+          <div className="flex gap-4 justify-center md:justify-start">
+            <Link
+              to="/registro"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 hover:shadow-emerald-500/40"
+            >
+              Asociarme Ahora
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <a
+              href="#deportes"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border-2 border-white/20 hover:border-white/40 text-white font-semibold text-lg transition-all hover:bg-white/10"
+            >
+              Ver Deportes
+            </a>
+          </div>
+        </div>
+
+        <div className="hidden md:flex justify-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="relative w-80 h-80 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-2xl shadow-blue-950/50 animate-float">
+            <div className="text-center text-white space-y-2">
+              <p className="text-6xl font-extrabold">10+</p>
+              <p className="text-lg text-blue-200">Disciplinas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <svg className="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </section>
+  )
+}

@@ -181,19 +181,19 @@ export default function Dashboard() {
         <CardContent>
           <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button asChild>
-              <Link to="/socios">
+              <Link to="/admin/socios">
                 <Users className="h-4 w-4" />
                 Nuevo Socio
               </Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link to="/deportes">
+              <Link to="/admin/deportes">
                 <Trophy className="h-4 w-4" />
                 Gestionar Deportes
               </Link>
             </Button>
             <Button variant="secondary" asChild>
-              <Link to="/pagos">
+              <Link to="/admin/pagos">
                 <CreditCard className="h-4 w-4" />
                 Registrar Pago
               </Link>

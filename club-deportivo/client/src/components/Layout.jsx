@@ -22,11 +22,11 @@ import { useQuery } from '@tanstack/react-query'
 import { pagosService } from '../services'
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/socios', label: 'Socios', icon: Users },
-  { path: '/deportes', label: 'Deportes', icon: Trophy },
-  { path: '/inscripciones', label: 'Inscripciones', icon: FileText },
-  { path: '/pagos', label: 'Pagos', icon: CreditCard },
+  { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/admin/socios', label: 'Socios', icon: Users },
+  { path: '/admin/deportes', label: 'Deportes', icon: Trophy },
+  { path: '/admin/inscripciones', label: 'Inscripciones', icon: FileText },
+  { path: '/admin/pagos', label: 'Pagos', icon: CreditCard },
 ]
 
 export default function Layout() {
@@ -101,7 +101,7 @@ export default function Layout() {
 
           <div className="border-t px-3 py-4">
             <Link
-              to="/perfil"
+              to="/admin/perfil"
               onClick={closeSidebar}
               className="flex items-center gap-3 rounded-lg px-3 py-2 mb-3 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
             >

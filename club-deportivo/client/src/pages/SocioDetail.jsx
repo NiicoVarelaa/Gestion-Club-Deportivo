@@ -43,7 +43,7 @@ export default function SocioDetail() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
         <Button size="icon" variant="ghost" asChild className="self-start">
-          <Link to="/socios">
+          <Link to="/admin/socios">
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>

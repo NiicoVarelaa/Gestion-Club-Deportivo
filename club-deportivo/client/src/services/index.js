@@ -29,3 +29,12 @@ export const pagosService = {
   generateMonthly: () => api.post('/pagos/generar'),
   getDashboard: () => api.get('/pagos/dashboard'),
 }
+
+export const publicService = {
+  register: (data) => api.post('/auth/signup-public', data),
+}
+
+export const portalService = {
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  getPortalData: () => api.get('/portal/me'),
+}

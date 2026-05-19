@@ -1,8 +1,15 @@
 import { useEffect, Suspense, lazy } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import Layout from './components/Layout'
 import Login from './pages/Login'
+import Landing from './pages/public/Landing'
+import Registro from './pages/public/Registro'
+import PortalLayout from './pages/portal/PortalLayout'
+import PortalDashboard from './pages/portal/PortalDashboard'
+import PortalPerfil from './pages/portal/PortalPerfil'
+import PortalDeportes from './pages/portal/PortalDeportes'
+import PortalPagos from './pages/portal/PortalPagos'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Socios = lazy(() => import('./pages/Socios'))
@@ -27,6 +34,13 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+function SocioProtectedRoute() {
+  const { user, loading } = useAuthStore()
+  if (loading) return <PageLoader />
+  if (!user) return <Navigate to="/login" />
+  return <Outlet />
+}
+
 export default function App() {
   const init = useAuthStore((state) => state.init)
 
@@ -36,16 +50,33 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Landing />} />
+      <Route path="/registro" element={<Registro />} />
+
+      {/* Socio portal */}
+      <Route element={<SocioProtectedRoute />}>
+        <Route path="/portal" element={<PortalLayout />}>
+          <Route index element={<PortalDashboard />} />
+          <Route path="perfil" element={<PortalPerfil />} />
+          <Route path="deportes" element={<PortalDeportes />} />
+          <Route path="pagos" element={<PortalPagos />} />
+        </Route>
+      </Route>
+
+      {/* Admin login */}
       <Route path="/login" element={<Login />} />
+
+      {/* Admin protected */}
       <Route
-        path="/"
+        path="/admin"
         element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
         <Route path="socios" element={<Suspense fallback={<PageLoader />}><Socios /></Suspense>} />
         <Route path="socios/:id" element={<Suspense fallback={<PageLoader />}><SocioDetail /></Suspense>} />
@@ -54,6 +85,9 @@ export default function App() {
         <Route path="pagos" element={<Suspense fallback={<PageLoader />}><Pagos /></Suspense>} />
         <Route path="perfil" element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>} />
       </Route>
+
+      {/* Redirect old admin paths */}
+      <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
     </Routes>
   )
 }

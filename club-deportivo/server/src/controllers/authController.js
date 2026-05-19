@@ -1,4 +1,5 @@
 import { getSupabase } from '../utils/supabase.js';
+import { registroSchema } from '../utils/validations.js';
 
 export async function signup(req, res, next) {
   try {
@@ -38,6 +39,41 @@ export async function logout(req, res, next) {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     res.json({ message: 'Logged out successfully' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function signupPublic(req, res, next) {
+  try {
+    const supabase = getSupabase();
+    const data = registroSchema.parse(req.body);
+
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: { nombre: data.nombre, apellido: data.apellido, dni: data.dni },
+      },
+    });
+    if (authError) throw authError;
+
+    const { data: socio, error: socioError } = await supabase
+      .from('Socio')
+      .insert({
+        dni: data.dni,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        email: data.email,
+        telefono: data.telefono || null,
+        supabaseUserId: authData.user.id,
+      })
+      .select('*')
+      .single();
+
+    if (socioError) throw socioError;
+
+    res.status(201).json({ socio, session: authData.session });
   } catch (err) {
     next(err);
   }
