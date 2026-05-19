@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
 import { registroSchema } from '@/schemas'
 import { publicService } from '@/services'
 import { useNavigate, Link } from 'react-router-dom'
@@ -66,14 +67,25 @@ export default function Registro() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 py-12 px-4">
-      <div className="w-full max-w-lg animate-slide-up">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full max-w-lg"
+      >
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          <ArrowLeft className="w-4 h-4" />
-          Volver al inicio
-        </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Volver al inicio
+          </Link>
+        </motion.div>
 
         <Card className="shadow-2xl border-0 overflow-hidden">
           <div className="bg-gradient-to-r from-primary to-blue-700 px-8 py-10 text-white">
@@ -85,8 +97,14 @@ export default function Registro() {
 
           <CardContent className="p-8 pt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {fields.map(({ name, label, placeholder, type, col }) => (
-                <div key={name} className={col === 'half' ? 'grid grid-cols-2 gap-4' : ''}>
+              {fields.map(({ name, label, placeholder, type, col }, index) => (
+                <motion.div
+                  key={name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + index * 0.05 }}
+                  className={col === 'half' ? 'grid grid-cols-2 gap-4' : ''}
+                >
                   <div className={col === 'half' ? '' : ''}>
                     <Label htmlFor={name}>{label}</Label>
                     <Input
@@ -97,23 +115,35 @@ export default function Registro() {
                       className={`mt-1 ${errors[name] ? 'border-red-500' : ''}`}
                     />
                     {errors[name] && (
-                      <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="text-red-500 text-xs mt-1"
+                      >
+                        {errors[name].message}
+                      </motion.p>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-6 text-lg bg-primary hover:bg-primary/90"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
               >
-                {isSubmitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  'Asociarme'
-                )}
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-6 text-lg bg-primary hover:bg-primary/90"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Asociarme'
+                  )}
+                </Button>
+              </motion.div>
             </form>
 
             <div className="mt-6 text-center">
@@ -126,14 +156,19 @@ export default function Registro() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="text-center">
-            <div className="mx-auto mb-4">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+              className="mx-auto mb-4"
+            >
               <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
-            </div>
+            </motion.div>
             <DialogTitle className="text-2xl">¡Bienvenido al club!</DialogTitle>
             <DialogDescription className="text-base mt-2">
               Tu registro fue exitoso. Ya podés acceder a tu portal para ver tus deportes, pagos y más.
