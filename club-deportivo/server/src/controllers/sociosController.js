@@ -1,82 +1,32 @@
 import { getSupabase } from '../utils/supabase.js';
 import { createSocioSchema, updateSocioSchema } from '../utils/validations.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
-export async function getSocios(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    const { page = 1, limit = 10, search, activo } = req.query;
-    const from = (parseInt(page) - 1) * parseInt(limit);
-    const to = from + parseInt(limit) - 1;
+export const getSocios = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const { page = 1, limit = 10, search, activo } = req.query;
+  const from = (parseInt(page) - 1) * parseInt(limit);
+  const to = from + parseInt(limit) - 1;
 
-    let query = supabase.from('Socio').select('*', { count: 'exact' }).order('apellido', { ascending: true });
+  let query = supabase.from('Socio').select('*', { count: 'exact' }).order('apellido', { ascending: true });
 
-    if (activo !== undefined) query = query.eq('activo', activo === 'true');
-    if (search) {
-      query = query.or(`nombre.ilike.%${search}%,apellido.ilike.%${search}%,dni.ilike.%${search}%,email.ilike.%${search}%`);
-    }
-
-    const { data, count, error } = await query.range(from, to);
-    if (error) throw error;
-
-    const inscripcionesPromises = (data || []).map(async (socio) => {
-      const { data: insc } = await supabase
-        .from('Inscripcion')
-        .select('*')
-        .eq('socioId', socio.id)
-        .eq('activo', true);
-
-      const list = insc || [];
-      if (list.length > 0) {
-        const deporteIds = [...new Set(list.map((i) => i.deporteId))];
-        const { data: deportes } = await supabase
-          .from('Deporte')
-          .select('*')
-          .in('id', deporteIds);
-
-        const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
-        for (const i of list) {
-          i.deporte = deporteMap[i.deporteId] || null;
-        }
-      }
-
-      return { ...socio, inscripciones: list };
-    });
-
-    const sociosWithInscripciones = await Promise.all(inscripcionesPromises);
-
-    res.json({
-      data: sociosWithInscripciones,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: count || 0,
-        pages: Math.ceil((count || 0) / parseInt(limit)),
-      },
-    });
-  } catch (err) {
-    next(err);
+  if (activo !== undefined) query = query.eq('activo', activo === 'true');
+  if (search) {
+    const sanitized = search.replace(/[%_]/g, '');
+    query = query.or(`nombre.ilike.%${sanitized}%,apellido.ilike.%${sanitized}%,dni.ilike.%${sanitized}%,email.ilike.%${sanitized}%`);
   }
-}
 
-export async function getSocioById(req, res, next) {
-  try {
-    const supabase = getSupabase();
+  const { data, count, error } = await query.range(from, to);
+  if (error) throw error;
 
-    const { data: socio, error } = await supabase
-      .from('Socio')
-      .select('*')
-      .eq('id', req.params.id)
-      .single();
-
-    if (error || !socio) return res.status(404).json({ error: 'Socio not found' });
-
-    const { data: inscripciones } = await supabase
+  const inscripcionesPromises = (data || []).map(async (socio) => {
+    const { data: insc } = await supabase
       .from('Inscripcion')
       .select('*')
       .eq('socioId', socio.id)
       .eq('activo', true);
 
-    const list = inscripciones || [];
+    const list = insc || [];
     if (list.length > 0) {
       const deporteIds = [...new Set(list.map((i) => i.deporteId))];
       const { data: deportes } = await supabase
@@ -90,66 +40,98 @@ export async function getSocioById(req, res, next) {
       }
     }
 
-    res.json({
-      data: {
-        ...socio,
-        inscripciones: list,
-      },
-    });
-  } catch (err) {
-    next(err);
+    return { ...socio, inscripciones: list };
+  });
+
+  const sociosWithInscripciones = await Promise.all(inscripcionesPromises);
+
+  res.json({
+    data: sociosWithInscripciones,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total: count || 0,
+      pages: Math.ceil((count || 0) / parseInt(limit)),
+    },
+  });
+});
+
+export const getSocioById = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+
+  const { data: socio, error } = await supabase
+    .from('Socio')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
+
+  if (error || !socio) return res.status(404).json({ error: 'Socio not found' });
+
+  const { data: inscripciones } = await supabase
+    .from('Inscripcion')
+    .select('*')
+    .eq('socioId', socio.id)
+    .eq('activo', true);
+
+  const list = inscripciones || [];
+  if (list.length > 0) {
+    const deporteIds = [...new Set(list.map((i) => i.deporteId))];
+    const { data: deportes } = await supabase
+      .from('Deporte')
+      .select('*')
+      .in('id', deporteIds);
+
+    const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+    for (const i of list) {
+      i.deporte = deporteMap[i.deporteId] || null;
+    }
   }
-}
 
-export async function createSocio(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    const validated = createSocioSchema.parse(req.body);
+  res.json({
+    data: {
+      ...socio,
+      inscripciones: list,
+    },
+  });
+});
 
-    const { data, error } = await supabase
-      .from('Socio')
-      .insert([validated])
-      .select()
-      .single();
+export const createSocio = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const validated = createSocioSchema.parse(req.body);
 
-    if (error) throw error;
-    res.status(201).json({ data, message: 'Socio created successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  const { data, error } = await supabase
+    .from('Socio')
+    .insert([validated])
+    .select()
+    .single();
 
-export async function updateSocio(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    const validated = updateSocioSchema.parse(req.body);
+  if (error) throw error;
+  res.status(201).json({ data, message: 'Socio created successfully' });
+});
 
-    const { data, error } = await supabase
-      .from('Socio')
-      .update(validated)
-      .eq('id', req.params.id)
-      .select()
-      .single();
+export const updateSocio = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const validated = updateSocioSchema.parse(req.body);
 
-    if (error) throw error;
-    res.json({ data, message: 'Socio updated successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  const { data, error } = await supabase
+    .from('Socio')
+    .update(validated)
+    .eq('id', req.params.id)
+    .select()
+    .single();
 
-export async function deleteSocio(req, res, next) {
-  try {
-    const supabase = getSupabase();
+  if (error) throw error;
+  res.json({ data, message: 'Socio updated successfully' });
+});
 
-    const { error } = await supabase
-      .from('Socio')
-      .update({ activo: false })
-      .eq('id', req.params.id);
+export const deleteSocio = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
 
-    if (error) throw error;
-    res.json({ message: 'Socio deactivated successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  const { error } = await supabase
+    .from('Socio')
+    .update({ activo: false })
+    .eq('id', req.params.id);
+
+  if (error) throw error;
+  res.status(204).send();
+});

@@ -4,11 +4,12 @@ import {
   createInscripcion,
   cancelInscripcion,
 } from '../controllers/inscripcionesController.js';
+import { authMiddleware, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', getInscripciones);
-router.post('/', createInscripcion);
-router.delete('/:id', cancelInscripcion);
+router.get('/', authMiddleware, requireAdmin, getInscripciones);
+router.post('/', authMiddleware, requireAdmin, createInscripcion);
+router.delete('/:id', authMiddleware, requireAdmin, cancelInscripcion);
 
 export default router;

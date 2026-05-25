@@ -6,13 +6,14 @@ import {
   generateMonthlyPayments,
   getDashboardStats,
 } from '../controllers/pagosController.js';
+import { authMiddleware, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', getPagos);
-router.post('/', createPago);
-router.get('/deudas/:socioId', getDeudasBySocio);
-router.post('/generar', generateMonthlyPayments);
-router.get('/dashboard', getDashboardStats);
+router.get('/', authMiddleware, requireAdmin, getPagos);
+router.post('/', authMiddleware, requireAdmin, createPago);
+router.get('/deudas/:socioId', authMiddleware, requireAdmin, getDeudasBySocio);
+router.post('/generar', authMiddleware, requireAdmin, generateMonthlyPayments);
+router.get('/dashboard', authMiddleware, requireAdmin, getDashboardStats);
 
 export default router;

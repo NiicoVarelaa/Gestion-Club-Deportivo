@@ -1,101 +1,82 @@
 import { getSupabase } from '../utils/supabase.js';
 import { createDeporteSchema, updateDeporteSchema } from '../utils/validations.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
-export async function getDeportes(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    let query = supabase.from('Deporte').select('*').order('nombre', { ascending: true });
+export const getDeportes = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  let query = supabase.from('Deporte').select('*').order('nombre', { ascending: true });
 
-    if (req.query.activo !== undefined) {
-      query = query.eq('activo', req.query.activo === 'true');
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    const deportesWithCount = await Promise.all(
-      (data || []).map(async (deporte) => {
-        const { count } = await supabase
-          .from('Inscripcion')
-          .select('*', { count: 'exact', head: true })
-          .eq('deporteId', deporte.id)
-          .eq('activo', true);
-        return { ...deporte, _count: { inscripciones: count || 0 } };
-      })
-    );
-
-    res.json({ data: deportesWithCount });
-  } catch (err) {
-    next(err);
+  if (req.query.activo !== undefined) {
+    query = query.eq('activo', req.query.activo === 'true');
   }
-}
 
-export async function getDeporteById(req, res, next) {
-  try {
-    const supabase = getSupabase();
+  const { data, error } = await query;
+  if (error) throw error;
 
-    const { data: deporte, error } = await supabase
-      .from('Deporte')
-      .select('*, Inscripcion(*, Socio(*))')
-      .eq('id', req.params.id)
-      .single();
+  const deportesWithCount = await Promise.all(
+    (data || []).map(async (deporte) => {
+      const { count } = await supabase
+        .from('Inscripcion')
+        .select('*', { count: 'exact', head: true })
+        .eq('deporteId', deporte.id)
+        .eq('activo', true);
+      return { ...deporte, _count: { inscripciones: count || 0 } };
+    })
+  );
 
-    if (error || !deporte) return res.status(404).json({ error: 'Deporte not found' });
-    res.json({ data: deporte });
-  } catch (err) {
-    next(err);
-  }
-}
+  res.json({ data: deportesWithCount });
+});
 
-export async function createDeporte(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    const validated = createDeporteSchema.parse(req.body);
+export const getDeporteById = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
 
-    const { data, error } = await supabase
-      .from('Deporte')
-      .insert([validated])
-      .select()
-      .single();
+  const { data: deporte, error } = await supabase
+    .from('Deporte')
+    .select('*, Inscripcion(*, Socio(*))')
+    .eq('id', req.params.id)
+    .single();
 
-    if (error) throw error;
-    res.status(201).json({ data, message: 'Deporte created successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  if (error || !deporte) return res.status(404).json({ error: 'Deporte not found' });
+  res.json({ data: deporte });
+});
 
-export async function updateDeporte(req, res, next) {
-  try {
-    const supabase = getSupabase();
-    const validated = updateDeporteSchema.parse(req.body);
+export const createDeporte = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const validated = createDeporteSchema.parse(req.body);
 
-    const { data, error } = await supabase
-      .from('Deporte')
-      .update(validated)
-      .eq('id', req.params.id)
-      .select()
-      .single();
+  const { data, error } = await supabase
+    .from('Deporte')
+    .insert([validated])
+    .select()
+    .single();
 
-    if (error) throw error;
-    res.json({ data, message: 'Deporte updated successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  if (error) throw error;
+  res.status(201).json({ data, message: 'Deporte created successfully' });
+});
 
-export async function deleteDeporte(req, res, next) {
-  try {
-    const supabase = getSupabase();
+export const updateDeporte = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const validated = updateDeporteSchema.parse(req.body);
 
-    const { error } = await supabase
-      .from('Deporte')
-      .update({ activo: false })
-      .eq('id', req.params.id);
+  const { data, error } = await supabase
+    .from('Deporte')
+    .update(validated)
+    .eq('id', req.params.id)
+    .select()
+    .single();
 
-    if (error) throw error;
-    res.json({ message: 'Deporte deactivated successfully' });
-  } catch (err) {
-    next(err);
-  }
-}
+  if (error) throw error;
+  res.json({ data, message: 'Deporte updated successfully' });
+});
+
+export const deleteDeporte = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('Deporte')
+    .update({ activo: false })
+    .eq('id', req.params.id);
+
+  if (error) throw error;
+  res.status(204).send();
+});
