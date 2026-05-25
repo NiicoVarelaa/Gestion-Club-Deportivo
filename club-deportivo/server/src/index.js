@@ -4,8 +4,11 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
+import compression from 'compression';
 import { rateLimit } from 'express-rate-limit';
+import { pinoHttp } from 'pino-http';
+import { logger } from './utils/logger.js';
+import { getSupabase } from './utils/supabase.js';
 import sociosRoutes from './routes/socios.js';
 import deportesRoutes from './routes/deportes.js';
 import inscripcionesRoutes from './routes/inscripciones.js';
@@ -22,29 +25,60 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
 }));
-app.use(morgan('dev'));
+app.use(compression());
+app.use(pinoHttp({ logger }));
 app.use(express.json());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Too many requests from this IP',
+  message: { error: 'Too many requests from this IP' },
 });
 app.use('/api/', limiter);
 
-app.use('/api/auth', authRoutes);
-app.use('/api/portal', portalRoutes);
-app.use('/api/socios', sociosRoutes);
-app.use('/api/deportes', deportesRoutes);
-app.use('/api/inscripciones', inscripcionesRoutes);
-app.use('/api/pagos', pagosRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/portal', portalRoutes);
+app.use('/api/v1/socios', sociosRoutes);
+app.use('/api/v1/deportes', deportesRoutes);
+app.use('/api/v1/inscripciones', inscripcionesRoutes);
+app.use('/api/v1/pagos', pagosRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { error } = await supabase.from('Socio').select('id').limit(1);
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      database: error ? 'disconnected' : 'connected',
+      uptime: process.uptime(),
+    });
+  } catch {
+    res.status(503).json({
+      status: 'degraded',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+    });
+  }
 });
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+  logger.info(`Server running on http://localhost:${PORT}`);
 });
+
+function gracefulShutdown(signal) {
+  logger.info(`${signal} received. Starting graceful shutdown...`);
+  server.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
