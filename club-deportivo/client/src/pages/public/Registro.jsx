@@ -8,14 +8,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { User, Mail, Phone, CreditCard, Lock, CheckCircle2, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import { User, Mail, Phone, CreditCard, Lock, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
 function PasswordStrength({ password }) {
   const strength = useMemo(() => {
@@ -64,7 +57,6 @@ const inputIcons = {
 
 export default function Registro() {
   const navigate = useNavigate()
-  const [showModal, setShowModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [submitError, setSubmitError] = useState(null)
@@ -99,18 +91,13 @@ export default function Registro() {
         localStorage.setItem('supabase_token', session.access_token)
         useAuthStore.setState({ session, user: session.user })
       }
-      setShowModal(true)
+      navigate('/portal')
     } catch (err) {
       setSubmitError(err.response?.data?.error || 'Error al registrarse. Intentá de nuevo.')
       setShakeKey((k) => k + 1)
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  const handleModalClose = () => {
-    setShowModal(false)
-    navigate('/portal')
   }
 
   const fields = [
@@ -290,32 +277,6 @@ export default function Registro() {
           </Card>
         </motion.div>
       </div>
-
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-              className="mx-auto mb-4"
-            >
-              <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-              </div>
-            </motion.div>
-            <DialogTitle className="text-2xl">¡Bienvenido a GesClub!</DialogTitle>
-            <DialogDescription className="text-base mt-2">
-              Tu registro fue exitoso. Ya podés acceder a tu portal para ver tus deportes, pagos y más.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center mt-4">
-            <Button onClick={handleModalClose} className="px-8 rounded-xl">
-              Ir a mi portal
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
