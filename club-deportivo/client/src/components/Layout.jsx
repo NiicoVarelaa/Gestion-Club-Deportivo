@@ -66,7 +66,7 @@ export default function Layout() {
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b px-6 py-4">
-            <h1 className="text-xl font-bold text-primary">Club Deportivo</h1>
+            <h1 className="text-xl font-bold text-primary">GesClub</h1>
             <Button size="icon" variant="ghost" onClick={closeSidebar} className="lg:hidden">
               <X className="h-5 w-5" />
             </Button>

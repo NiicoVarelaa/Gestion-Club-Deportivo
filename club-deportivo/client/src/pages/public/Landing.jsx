@@ -36,9 +36,9 @@ export default function Landing() {
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CD</span>
+              <span className="text-white font-bold text-sm">GC</span>
             </div>
-            <span className="font-bold text-lg hidden sm:block">Club Deportivo</span>
+            <span className="font-bold text-lg hidden sm:block">GesClub</span>
           </motion.div>
           <div className="flex items-center gap-4">
             <Link
@@ -78,7 +78,7 @@ export default function Landing() {
           className="container mx-auto px-6 text-center"
         >
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Club Deportivo. Todos los derechos reservados.
+            © {new Date().getFullYear()} GesClub. Todos los derechos reservados.
           </p>
         </motion.div>
       </footer>

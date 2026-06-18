@@ -68,7 +68,7 @@ function FeaturedCard({ sport, deporte, index }) {
     <motion.div
       variants={cardVariants}
       whileHover={{ y: -12 }}
-      className="group relative bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30"
+      className="group relative bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-lg shadow-black/5 dark:shadow-black/20 transition-all duration-500 hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30"
     >
       {/* Header con gradiente */}
       <div className={`relative bg-gradient-to-br ${sport.gradient} p-8 pb-16 rounded-t-[2rem]`}>

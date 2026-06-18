@@ -74,9 +74,9 @@ export default function PortalLayout() {
               <SheetContent side="left" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">CD</span>
-                  </div>
-                  <span className="font-bold">Club Deportivo</span>
+<span className="text-white font-bold text-sm">GC</span>
+                    </div>
+                    <span className="font-bold">GesClub</span>
                 </div>
                 <nav className="flex flex-col gap-1">
                   <NavLinks location={location} deuda={deuda} />
@@ -86,9 +86,9 @@ export default function PortalLayout() {
 
             <Link to="/portal" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CD</span>
-              </div>
-              <span className="font-bold text-lg hidden sm:block">Club Deportivo</span>
+<span className="text-white font-bold text-sm">GC</span>
+                  </div>
+                  <span className="font-bold text-lg hidden sm:block">GesClub</span>
             </Link>
           </div>
 

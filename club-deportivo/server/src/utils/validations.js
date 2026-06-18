@@ -9,12 +9,12 @@ function sanitizeHtml(str) {
     .replace(/\//g, '&#x2F;');
 }
 
-const sanitizeTransform = z.string().transform(sanitizeHtml);
+const stringField = (min, max) => z.string().min(min).max(max).transform(sanitizeHtml);
 
 export const createSocioSchema = z.object({
   dni: z.string().min(6).max(20),
-  nombre: sanitizeTransform.min(2).max(100),
-  apellido: sanitizeTransform.min(2).max(100),
+  nombre: stringField(2, 100),
+  apellido: stringField(2, 100),
   email: z.string().email(),
   telefono: z.string().max(20).optional().or(z.literal('')),
   fechaNacimiento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato invalido').optional().or(z.literal('')),
@@ -23,8 +23,8 @@ export const createSocioSchema = z.object({
 export const updateSocioSchema = createSocioSchema.partial();
 
 export const createDeporteSchema = z.object({
-  nombre: sanitizeTransform.min(2).max(100),
-  descripcion: sanitizeTransform.max(500).optional().or(z.literal('')),
+  nombre: stringField(2, 100),
+  descripcion: z.string().max(500).transform(sanitizeHtml).optional().or(z.literal('')),
   cuotaMensual: z.string().or(z.number()).transform((val) => {
     const num = typeof val === 'string' ? parseFloat(val) : val;
     return num;
@@ -50,8 +50,8 @@ export const createPagoSchema = z.object({
 });
 
 export const registroSchema = z.object({
-  nombre: sanitizeTransform.min(2).max(100),
-  apellido: sanitizeTransform.min(2).max(100),
+  nombre: stringField(2, 100),
+  apellido: stringField(2, 100),
   dni: z.string().min(6).max(20).regex(/^\d+$/, 'DNI debe contener solo numeros'),
   email: z.string().email(),
   telefono: z.string().max(20).optional().or(z.literal('')),

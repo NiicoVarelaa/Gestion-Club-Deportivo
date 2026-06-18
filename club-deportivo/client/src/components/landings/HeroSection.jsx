@@ -42,7 +42,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-lg md:text-xl text-blue-100/80 max-w-lg mx-auto md:mx-0"
           >
-            Entrená, competí y crecé en el club deportivo más completo de la zona. Más de 10 disciplinas y una comunidad que te espera.
+            Entrená, competí y crecé con GesClub. Más de 10 disciplinas y una comunidad que te espera.
           </motion.p>
 
           <motion.div

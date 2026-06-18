@@ -36,12 +36,12 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/portal', portalRoutes);
-app.use('/api/v1/socios', sociosRoutes);
-app.use('/api/v1/deportes', deportesRoutes);
-app.use('/api/v1/inscripciones', inscripcionesRoutes);
-app.use('/api/v1/pagos', pagosRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/portal', portalRoutes);
+app.use('/api/socios', sociosRoutes);
+app.use('/api/deportes', deportesRoutes);
+app.use('/api/inscripciones', inscripcionesRoutes);
+app.use('/api/pagos', pagosRoutes);
 
 app.get('/api/health', async (req, res) => {
   try {
@@ -65,7 +65,7 @@ app.get('/api/health', async (req, res) => {
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+  logger.info(`GesClub server running on http://localhost:${PORT}`);
 });
 
 function gracefulShutdown(signal) {

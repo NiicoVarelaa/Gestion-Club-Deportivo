@@ -1,4 +1,4 @@
-# Club Deportivo — Sistema de Gestión
+# GesClub — Sistema de Gestión Deportiva
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express)](https://expressjs.com/)
@@ -260,49 +260,49 @@ club-deportivo/
 ### Auth
 | Método | Ruta | Descripción |
 | ------ | ---- | ----------- |
-| `POST` | `/api/v1/auth/signup` | Registro admin |
-| `POST` | `/api/v1/auth/signup-public` | Registro público (socio) |
-| `POST` | `/api/v1/auth/login` | Login |
-| `POST` | `/api/v1/auth/logout` | Logout |
+| `POST` | `/api/auth/signup` | Registro admin |
+| `POST` | `/api/auth/signup-public` | Registro público (socio) |
+| `POST` | `/api/auth/login` | Login |
+| `POST` | `/api/auth/logout` | Logout |
 
 ### Portal del Socio (auth requerida)
 | Método | Ruta | Descripción |
 | ------ | ---- | ----------- |
-| `GET` | `/api/v1/portal/me` | Datos del socio logueado |
+| `GET` | `/api/portal/me` | Datos del socio logueado |
 
 ### Socios (admin)
 | Método | Ruta | Descripción | Query params |
 | ------ | ---- | ----------- | ------------ |
-| `GET` | `/api/v1/socios` | Listar socios | `search`, `page`, `limit` |
-| `GET` | `/api/v1/socios/:id` | Detalle de socio | — |
-| `POST` | `/api/v1/socios` | Crear socio | — |
-| `PUT` | `/api/v1/socios/:id` | Actualizar socio | — |
-| `DELETE` | `/api/v1/socios/:id` | Dar de baja | — |
+| `GET` | `/api/socios` | Listar socios | `search`, `page`, `limit` |
+| `GET` | `/api/socios/:id` | Detalle de socio | — |
+| `POST` | `/api/socios` | Crear socio | — |
+| `PUT` | `/api/socios/:id` | Actualizar socio | — |
+| `DELETE` | `/api/socios/:id` | Dar de baja | — |
 
 ### Deportes
 | Método | Ruta | Descripción |
 | ------ | ---- | ----------- |
-| `GET` | `/api/v1/deportes` | Listar deportes |
-| `GET` | `/api/v1/deportes/:id` | Detalle de deporte |
-| `POST` | `/api/v1/deportes` | Crear deporte |
-| `PUT` | `/api/v1/deportes/:id` | Actualizar deporte |
-| `DELETE` | `/api/v1/deportes/:id` | Dar de baja |
+| `GET` | `/api/deportes` | Listar deportes |
+| `GET` | `/api/deportes/:id` | Detalle de deporte |
+| `POST` | `/api/deportes` | Crear deporte |
+| `PUT` | `/api/deportes/:id` | Actualizar deporte |
+| `DELETE` | `/api/deportes/:id` | Dar de baja |
 
 ### Inscripciones (admin)
 | Método | Ruta | Descripción |
 | ------ | ---- | ----------- |
-| `GET` | `/api/v1/inscripciones` | Listar inscripciones |
-| `POST` | `/api/v1/inscripciones` | Inscribir socio |
-| `DELETE` | `/api/v1/inscripciones/:id` | Cancelar inscripción |
+| `GET` | `/api/inscripciones` | Listar inscripciones |
+| `POST` | `/api/inscripciones` | Inscribir socio |
+| `DELETE` | `/api/inscripciones/:id` | Cancelar inscripción |
 
 ### Pagos (admin)
 | Método | Ruta | Descripción | Query params |
 | ------ | ---- | ----------- | ------------ |
-| `GET` | `/api/v1/pagos` | Listar pagos | `socioId`, `estado`, `mes`, `anio` |
-| `POST` | `/api/v1/pagos` | Registrar pago | — |
-| `GET` | `/api/v1/pagos/deudas/:id` | Deudas de un socio | — |
-| `POST` | `/api/v1/pagos/generar` | Generar cuotas del mes | — |
-| `GET` | `/api/v1/pagos/dashboard` | Stats del dashboard | — |
+| `GET` | `/api/pagos` | Listar pagos | `socioId`, `estado`, `mes`, `anio` |
+| `POST` | `/api/pagos` | Registrar pago | — |
+| `GET` | `/api/pagos/deudas/:id` | Deudas de un socio | — |
+| `POST` | `/api/pagos/generar` | Generar cuotas del mes | — |
+| `GET` | `/api/pagos/dashboard` | Stats del dashboard | — |
 
 ### Health
 | Método | Ruta | Descripción |
@@ -413,7 +413,7 @@ cp client/.env.example client/.env
 ```env
 VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGci...
-VITE_API_URL=http://localhost:3000/api/v1
+VITE_API_URL=http://localhost:3000/api
 ```
 
 ### 5. Sincronizar base de datos
@@ -482,7 +482,7 @@ El proyecto está configurado para deploy automático al pushear a `main`.
 
 | Entorno | Plataforma | Rama | Comando |
 | ------- | ---------- | ---- | ------- |
-| Backend | Render | `main` | `pnpm -F server start` |
+| Backend | Render | `main` | `pnpm -F gesclub-server start` |
 | Frontend | Vercel | `main` | detecta `client/` automáticamente |
 
 ### Configuración de Supabase para producción
@@ -520,7 +520,7 @@ En el dashboard de Supabase, ir a **Authentication > URL Configuration**:
 - **Pino** para logging estructurado en producción (JSON), pretty-print en desarrollo
 - **Compression** middleware para gzip automático de responses
 - **Graceful shutdown** con cierre de HTTP server y timeout de 10s
-- **API versioning** (`/api/v1/`) para compatibilidad futura
+- Todas las rutas de API montadas bajo `/api/`
 - **Sanitización HTML** en todos los inputs de texto vía Zod transforms
 - **Role-based access**: middleware `requireAdmin` verifica `user_metadata.role`
 - **Tema oscuro**: implementación propia via `ThemeProvider` + `localStorage`
