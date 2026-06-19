@@ -41,6 +41,18 @@ export const useAuthStore = create((set) => ({
     return data
   },
 
+  resetPassword: async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) throw error
+  },
+
+  updatePassword: async (password) => {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+  },
+
   logout: async () => {
     await supabase.auth.signOut()
     localStorage.removeItem('supabase_token')

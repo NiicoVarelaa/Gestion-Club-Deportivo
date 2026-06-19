@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.1.2",
   "scripts": {
-    "dev": "concurrently \"pnpm -F server dev\" \"pnpm -F client dev\"",
-    "build": "pnpm -F client build",
-    "db:generate": "pnpm -F server db:generate",
-    "db:migrate": "pnpm -F server db:migrate",
-    "db:push": "pnpm -F server db:push",
-    "db:studio": "pnpm -F server db:studio"
+    "dev": "concurrently \"pnpm -F gesclub-server dev\" \"pnpm -F gesclub-client dev\"",
+    "build": "pnpm -F gesclub-client build",
+    "db:generate": "pnpm -F gesclub-server db:generate",
+    "db:migrate": "pnpm -F gesclub-server db:migrate",
+    "db:push": "pnpm -F gesclub-server db:push",
+    "db:studio": "pnpm -F gesclub-server db:studio"
   },
   "dependencies": {
     "react": "^18.3.1",

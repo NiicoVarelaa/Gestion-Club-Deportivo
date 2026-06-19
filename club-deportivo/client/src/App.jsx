@@ -5,6 +5,8 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Landing from './pages/public/Landing'
 import Registro from './pages/public/Registro'
+import ForgotPassword from './pages/public/ForgotPassword'
+import ResetPassword from './pages/public/ResetPassword'
 import PortalLayout from './pages/portal/PortalLayout'
 import PortalDashboard from './pages/portal/PortalDashboard'
 import PortalPerfil from './pages/portal/PortalPerfil'
@@ -53,6 +55,8 @@ export default function App() {
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
       <Route path="/registro" element={<Registro />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Socio portal */}
       <Route element={<SocioProtectedRoute />}>
