@@ -130,26 +130,51 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {paymentData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={paymentData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={4}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
+              <figure>
+                <figcaption className="sr-only">
+                  Estado de pagos: {paymentData.map((d) => `${d.name}: ${d.value}`).join(', ')}
+                </figcaption>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart
+                    role="img"
+                    aria-label={`Estado de pagos: ${paymentData.map((d) => `${d.name}: ${d.value}`).join(', ')}`}
                   >
-                    {paymentData.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    <Pie
+                      data={paymentData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={4}
+                      dataKey="value"
+                      label={({ name, value }) => `${name}: ${value}`}
+                    >
+                      {paymentData.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <table className="sr-only" aria-label="Datos del gráfico estado de pagos">
+                  <caption>Estado de pagos</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Estado</th>
+                      <th scope="col">Cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paymentData.map((d) => (
+                      <tr key={d.name}>
+                        <td>{d.name}</td>
+                        <td>{d.value}</td>
+                      </tr>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+                  </tbody>
+                </table>
+              </figure>
             ) : (
               <p className="py-8 text-center text-sm text-muted-foreground">Sin datos de pagos</p>
             )}
@@ -161,15 +186,41 @@ export default function Dashboard() {
             <CardTitle>Resumen General</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} className="text-muted-foreground" />
-                <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
-                <Tooltip />
-                <Bar dataKey="value" fill="#2563eb" radius={[4, 4, 0, 0]} name="Cantidad" />
-              </BarChart>
-            </ResponsiveContainer>
+            <figure>
+              <figcaption className="sr-only">
+                Resumen general: {barData.map((d) => `${d.name}: ${d.value}`).join(', ')}
+              </figcaption>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={barData}
+                  role="img"
+                  aria-label={`Resumen general: ${barData.map((d) => `${d.name}: ${d.value}`).join(', ')}`}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#2563eb" radius={[4, 4, 0, 0]} name="Cantidad" />
+                </BarChart>
+              </ResponsiveContainer>
+              <table className="sr-only" aria-label="Datos del gráfico resumen general">
+                <caption>Resumen general</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {barData.map((d) => (
+                    <tr key={d.name}>
+                      <td>{d.name}</td>
+                      <td>{d.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </figure>
           </CardContent>
         </Card>
       </div>
