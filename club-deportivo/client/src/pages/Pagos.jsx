@@ -59,6 +59,8 @@ export default function Pagos() {
   const [selectedSocio, setSelectedSocio] = useState(null)
   const [filterEstado, setFilterEstado] = useState('')
   const [page, setPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const limit = 15
 
   const now = new Date()
@@ -125,16 +127,27 @@ export default function Pagos() {
     createMutation.mutate(data)
   }
 
-  const handleSocioChange = (e) => {
-    const socioId = e.target.value
-    setSelectedSocio(socioId)
-    setValue('socioId', socioId)
-    if (socioId) refetchDeudas()
+  const selectSocio = (socio) => {
+    setSelectedSocio(socio.id)
+    setSearchTerm(`${socio.nombre} ${socio.apellido}`)
+    setValue('socioId', socio.id)
+    setDropdownOpen(false)
+    if (socio.id) refetchDeudas()
+  }
+
+  const clearSocio = () => {
+    setSelectedSocio(null)
+    setSearchTerm('')
+    setValue('socioId', '')
+    setDropdownOpen(false)
   }
 
   const pagos = pagosData?.data || []
   const sociosList = socios?.data || []
   const deportesList = deportes?.data || []
+  const filteredSocios = sociosList.filter(s =>
+    `${s.nombre} ${s.apellido}`.toLowerCase().includes(searchTerm.toLowerCase())
+  )
   const pagination = pagosData?.pagination
 
   const handleExportPDF = () => {
@@ -261,7 +274,7 @@ export default function Pagos() {
         </CardContent>
       </Card>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) { reset(); setSelectedSocio(null) } }}>
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) { reset(); setSelectedSocio(null); setSearchTerm(''); setDropdownOpen(false) } }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Registrar Pago</DialogTitle>
@@ -269,18 +282,45 @@ export default function Pagos() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="socioId">Socio</Label>
-                <select
-                  id="socioId"
-                  className={selectStyles}
-                  defaultValue=""
-                  onChange={handleSocioChange}
-                >
-                  <option value="" disabled>Seleccionar socio</option>
-                  {sociosList.map((s) => (
-                    <option key={s.id} value={s.id}>{s.nombre} {s.apellido}</option>
-                  ))}
-                </select>
+                <Label htmlFor="socioSearch">Socio</Label>
+                <div className="relative">
+                  <Input
+                    id="socioSearch"
+                    placeholder="Buscar socio por nombre o apellido..."
+                    value={searchTerm}
+                    onChange={(e) => { setSearchTerm(e.target.value); setDropdownOpen(true) }}
+                    onFocus={() => setDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
+                  />
+                  {selectedSocio && (
+                    <button
+                      type="button"
+                      onClick={clearSocio}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      ✕
+                    </button>
+                  )}
+                  {dropdownOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-48 overflow-y-auto">
+                      {filteredSocios.length === 0 ? (
+                        <p className="px-3 py-2 text-sm text-muted-foreground">Sin resultados</p>
+                      ) : (
+                        filteredSocios.map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-accent transition-colors"
+                            onMouseDown={(e) => { e.preventDefault(); selectSocio(s) }}
+                          >
+                            {s.nombre} {s.apellido}
+                            <span className="ml-2 text-xs text-muted-foreground">DNI {s.dni}</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
                 {errors.socioId && <p className="text-sm text-destructive">{errors.socioId.message}</p>}
               </div>
               <div className="space-y-2">
@@ -330,7 +370,7 @@ export default function Pagos() {
             )}
 
             <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); reset(); setSelectedSocio(null) }}>
+              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); reset(); setSelectedSocio(null); setSearchTerm(''); setDropdownOpen(false) }}>
                 Cancelar
               </Button>
               <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
