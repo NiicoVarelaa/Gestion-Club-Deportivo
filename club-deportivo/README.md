@@ -38,7 +38,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page pÃ
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| â€” | ![Landing Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.png) |
+| ![Landing 1](./screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-1.png) ![Landing 2](./screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-2.png) ![Landing 3](./screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-3.png) | ![Landing Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.png) |
 
 ---
 
@@ -46,7 +46,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page pÃ
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| â€” | ![Login Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.png) |
+| ![Login Desktop](./screenshots/Club%20Deportes%20-%20Desktop/Login-Desktop.png) | ![Login Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.png) |
 
 ---
 
@@ -54,7 +54,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page pÃ
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| â€” | ![Registro Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.png) |
+| ![Registro Desktop](./screenshots/Club%20Deportes%20-%20Desktop/Registro-Desktop.png) | ![Registro Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.png) |
 
 ---
 
