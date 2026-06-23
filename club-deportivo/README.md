@@ -29,77 +29,72 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 ## Screenshots
 
+> Las capturas de **Desktop** muestran el panel de administración en modo Light y Dark.
+> Las capturas de **Mobile** muestran la experiencia responsive en dispositivo móvil.
+
+---
+
 ### Landing Page
 
-**Hero Section** — Animaciones con Framer Motion, gradientes modernos y CTA destacado.
+| Desktop | Mobile |
+|:-------:|:------:|
+| — | ![Landing 1](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-1.png) ![Landing 2](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-2.png) ![Landing 3](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-3.png) |
 
-![Landing Hero](./screenshots/landing-hero.png)
+---
 
-**Disciplinas Destacadas** — Cards premium con datos dinámicos desde la API (Fútbol, Natación, Básquet).
+### Login
 
-![Landing Deportes](./screenshots/landing-deportes.png)
+| Desktop | Mobile |
+|:-------:|:------:|
+| — | ![Login Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.png) |
 
-**Sección de Beneficios** — Tarjetas con iconos y animaciones al hacer scroll.
-
-![Landing Beneficios](./screenshots/landing-beneficios.png)
+---
 
 ### Registro Público
 
-**Formulario de Inscripción** — Validación en tiempo real con Zod + React Hook Form, animaciones staggered.
+| Desktop | Mobile |
+|:-------:|:------:|
+| — | ![Registro Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.png) |
 
-![Registro](./screenshots/registro.png)
+---
 
-### Portal del Socio
+### Dashboard
 
-**Dashboard Personal** — Estado de cuenta, deportes activos, progreso de pagos y alertas de deuda.
+| Light | Dark | Mobile |
+|:-----:|:----:|:------:|
+| ![Dashboard Light](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.png) | ![Dashboard Dark](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.png) | ![Dashboard Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile-1.png) ![Dashboard Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile-2.png) |
 
-![Portal Dashboard](./screenshots/portal-dashboard.png)
+---
 
-**Mis Deportes** — Lista de disciplinas con fecha de inscripción y cuota mensual.
+### Socios
 
-![Portal Deportes](./screenshots/portal-deportes.png)
+| Light | Dark | Mobile |
+|:-----:|:----:|:------:|
+| ![Socios Light](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.png) | ![Socios Dark](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.png) | ![Socios Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile-1.png) ![Socios Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile-2.png) |
 
-**Historial de Pagos** — Tabla con estados PAGADO/PENDIENTE/VENCIDO y progreso anual.
+---
 
-![Portal Pagos](./screenshots/portal-pagos.png)
+### Deportes
 
-**Perfil** — Datos personales y estado de membresía.
+| Light | Dark | Mobile |
+|:-----:|:----:|:------:|
+| ![Deportes Light](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.png) | ![Deportes Dark](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.png) | ![Deportes Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile-1.png) ![Deportes Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile-2.png) |
 
-![Portal Perfil](./screenshots/portal-perfil.png)
+---
 
-### Panel de Administración
+### Inscripciones
 
-**Dashboard Admin** — Gráficos interactivos (Recharts), estadísticas en tiempo real y accesos rápidos.
+| Light | Dark | Mobile |
+|:-----:|:----:|:------:|
+| ![Inscripciones Light](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.png) | ![Inscripciones Dark](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.png) | ![Inscripciones Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile-1.png) ![Inscripciones Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile-2.png) |
 
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+---
 
-**Gestión de Socios** — Tabla con búsqueda, paginación, skeleton loaders y estados vacíos.
+### Pagos
 
-![Admin Socios](./screenshots/admin-socios.png)
-
-**Detalle de Socio** — Información completa con inscripciones y deudas.
-
-![Admin Socio Detail](./screenshots/admin-socio-detail.png)
-
-**Gestión de Deportes** — CRUD completo con conteo de inscripciones.
-
-![Admin Deportes](./screenshots/admin-deportes.png)
-
-**Gestión de Pagos** — Filtros por estado/mes/año, exportación a PDF y Excel.
-
-![Admin Pagos](./screenshots/admin-pagos.png)
-
-**Gestión de Inscripciones** — Inscripción y cancelación con validación de duplicados.
-
-![Admin Inscripciones](./screenshots/admin-inscripciones.png)
-
-**Login** — Autenticación con Supabase Auth, UI en español.
-
-![Login](./screenshots/login.png)
-
-**Tema Oscuro** — Persistencia en localStorage, transiciones suaves.
-
-![Dark Mode](./screenshots/dark-mode.png)
+| Light | Dark | Mobile |
+|:-----:|:----:|:------:|
+| ![Pagos Light](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.png) | ![Pagos Dark](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.png) | ![Pagos Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile-1.png) ![Pagos Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile-2.png) |
 
 ---
 
