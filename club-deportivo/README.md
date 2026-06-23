@@ -38,7 +38,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| ‚Äî | ![Landing 1](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-1.png) ![Landing 2](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-2.png) ![Landing 3](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile-3.png) |
+| ‚Äî | ![Landing Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.png) |
 
 ---
 
@@ -62,7 +62,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Dashboard Light](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.png) | ![Dashboard Dark](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.png) | ![Dashboard Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile-1.png) ![Dashboard Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile-2.png) |
+| ![Dashboard Light](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.png) | ![Dashboard Dark](./screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.png) | ![Dashboard Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile.png) |
 
 ---
 
@@ -70,7 +70,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Socios Light](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.png) | ![Socios Dark](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.png) | ![Socios Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile-1.png) ![Socios Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile-2.png) |
+| ![Socios Light](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.png) | ![Socios Dark](./screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.png) | ![Socios Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile.png) |
 
 ---
 
@@ -78,7 +78,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Deportes Light](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.png) | ![Deportes Dark](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.png) | ![Deportes Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile-1.png) ![Deportes Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile-2.png) |
+| ![Deportes Light](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.png) | ![Deportes Dark](./screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.png) | ![Deportes Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile.png) |
 
 ---
 
@@ -86,7 +86,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Inscripciones Light](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.png) | ![Inscripciones Dark](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.png) | ![Inscripciones Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile-1.png) ![Inscripciones Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile-2.png) |
+| ![Inscripciones Light](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.png) | ![Inscripciones Dark](./screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.png) | ![Inscripciones Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile.png) |
 
 ---
 
@@ -94,7 +94,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p√
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Pagos Light](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.png) | ![Pagos Dark](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.png) | ![Pagos Mobile 1](./screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile-1.png) ![Pagos Mobile 2](./screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile-2.png) |
+| ![Pagos Light](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.png) | ![Pagos Dark](./screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.png) | ![Pagos Mobile](./screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile.png) |
 
 ---
 
