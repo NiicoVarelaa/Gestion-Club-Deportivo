@@ -78,21 +78,17 @@ export default function BenefitsSection() {
               key={title}
               variants={cardVariants}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="p-4 md:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/10 dark:to-transparent"
+              className="p-8 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/10 dark:to-transparent text-center space-y-4"
             >
-              <div className="flex md:flex-col items-center gap-4 md:gap-4 text-left md:text-center">
-                <motion.div
-                  className={`w-12 h-12 md:w-16 md:h-16 shrink-0 rounded-full ${colorMap[color].bg} flex items-center justify-center`}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                >
-                  <Icon className={`w-6 h-6 md:w-8 md:h-8 ${colorMap[color].icon}`} />
-                </motion.div>
-                <div>
-                  <h3 className="text-base md:text-xl font-bold">{title}</h3>
-                  <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">{description}</p>
-                </div>
-              </div>
+              <motion.div
+                className={`w-16 h-16 mx-auto rounded-full ${colorMap[color].bg} flex items-center justify-center`}
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
+                <Icon className={`w-8 h-8 ${colorMap[color].icon}`} />
+              </motion.div>
+              <h3 className="text-xl font-bold">{title}</h3>
+              <p className="text-muted-foreground">{description}</p>
             </motion.div>
           ))}
         </motion.div>
