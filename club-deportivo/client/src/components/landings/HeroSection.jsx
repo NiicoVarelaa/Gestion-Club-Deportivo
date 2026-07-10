@@ -70,8 +70,28 @@ export default function HeroSection() {
               Ver Deportes
             </a>
           </motion.div>
+
+          {/* Mobile stats bar — solo mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="flex md:hidden gap-6 justify-center mt-10"
+          >
+            {[
+              { value: '10+', label: 'Disciplinas' },
+              { value: '+120', label: 'Socios' },
+              { value: '3', label: 'Turnos' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl font-extrabold text-white">{stat.value}</p>
+                <p className="text-xs text-blue-200/80 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
+        {/* Desktop stat card — solo desktop */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}

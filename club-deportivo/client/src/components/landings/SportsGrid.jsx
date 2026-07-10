@@ -213,12 +213,13 @@ export default function SportsGrid() {
           className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto"
         >
           {featuredSports.map((sport, index) => (
-            <FeaturedCard
-              key={sport.key}
-              sport={sport}
-              deporte={getDeporte(sport.key)}
-              index={index}
-            />
+            <div key={sport.key} className={index === 2 ? 'hidden md:block' : ''}>
+              <FeaturedCard
+                sport={sport}
+                deporte={getDeporte(sport.key)}
+                index={index}
+              />
+            </div>
           ))}
         </motion.div>
 
