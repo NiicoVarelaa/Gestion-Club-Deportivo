@@ -4,10 +4,12 @@ import HeroSection from '@/components/landings/HeroSection'
 import SportsGrid from '@/components/landings/SportsGrid'
 import BenefitsSection from '@/components/landings/BenefitsSection'
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/components/ThemeProvider'
 
 export default function Landing() {
   const [scrolled, setScrolled] = useState(false)
+  const { theme, toggleTheme } = useTheme()
   const { scrollY } = useScroll()
 
   useEffect(() => {
@@ -41,6 +43,13 @@ export default function Landing() {
             <span className="font-bold text-lg hidden sm:block">GesClub</span>
           </motion.div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             <Link
               to="/portal"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

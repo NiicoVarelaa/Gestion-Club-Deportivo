@@ -9,7 +9,8 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User } from 'lucide-react'
+import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
+import { useTheme } from '@/components/ThemeProvider'
 
 const navItems = [
   { to: '/portal', label: 'Inicio', icon: LayoutDashboard },
@@ -51,6 +52,7 @@ export default function PortalLayout() {
   const location = useLocation()
   const { socio, deuda } = useSocioStore()
   const { logout: authLogout } = useAuthStore()
+  const { theme, toggleTheme } = useTheme()
 
   const handleLogout = async () => {
     useSocioStore.getState().logout()
@@ -97,6 +99,13 @@ export default function PortalLayout() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             <Link to="/portal/perfil">
               <Avatar className="h-9 w-9 ring-2 ring-primary/20 cursor-pointer">
                 <AvatarFallback className="bg-primary text-white text-sm">
