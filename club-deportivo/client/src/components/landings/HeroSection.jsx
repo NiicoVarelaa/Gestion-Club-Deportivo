@@ -16,7 +16,7 @@ export default function HeroSection() {
         </svg>
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 py-20 text-center md:text-left md:grid md:grid-cols-2 md:items-center gap-12">
+      <div className="relative z-10 container mx-auto px-6 py-20 text-center">
         <div className="space-y-8">
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
@@ -40,7 +40,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="text-lg md:text-xl text-blue-100/80 max-w-lg mx-auto md:mx-0"
+            className="text-lg md:text-xl text-blue-100/80 max-w-lg mx-auto"
           >
             Entrená, competí y crecé con GesClub. Más de 10 disciplinas y una comunidad que te espera.
           </motion.p>
@@ -49,11 +49,11 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-            className="flex gap-4 justify-center md:justify-start"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
           >
             <Link
               to="/registro"
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 hover:shadow-emerald-500/40"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 hover:shadow-emerald-500/40 w-full sm:w-auto"
             >
               Asociarme Ahora
               <motion.span
@@ -65,30 +65,13 @@ export default function HeroSection() {
             </Link>
             <a
               href="#deportes"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border-2 border-white/20 hover:border-white/40 text-white font-semibold text-lg transition-all hover:bg-white/10"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-white/20 hover:border-white/40 text-white font-semibold text-lg transition-all hover:bg-white/10 w-full sm:w-auto"
             >
               Ver Deportes
             </a>
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="hidden md:flex justify-center"
-        >
-          <motion.div
-            animate={{ y: [0, -12, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative w-80 h-80 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-2xl shadow-blue-950/50"
-          >
-            <div className="text-center text-white space-y-2">
-              <p className="text-6xl font-extrabold">10+</p>
-              <p className="text-lg text-blue-200">Disciplinas</p>
-            </div>
-          </motion.div>
-        </motion.div>
       </div>
 
       <motion.div
