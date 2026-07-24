@@ -5,16 +5,8 @@ import { ArrowRight } from 'lucide-react'
 export default function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 60 M 0 0 L 60 60" stroke="white" strokeWidth="1" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hero_grid)" />
-        </svg>
-      </div>
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/club.webp')" }} />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-800/70 to-indigo-900/80" />
 
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
         <div className="space-y-8">
