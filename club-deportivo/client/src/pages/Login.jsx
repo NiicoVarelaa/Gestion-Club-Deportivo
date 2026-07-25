@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
-import { Mail, Lock, Eye, EyeOff, Loader2, Trophy, ArrowLeft } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Login() {
@@ -52,8 +52,8 @@ export default function Login() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-600">
-            <Trophy className="h-8 w-8 text-white" />
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img src="/logo.webp" alt="GesClub" className="h-14 w-auto" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">GesClub</h1>
           <p className="text-gray-600 dark:text-gray-400">Sistema de Gestión</p>
