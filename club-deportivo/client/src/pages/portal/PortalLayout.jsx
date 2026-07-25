@@ -75,7 +75,7 @@ export default function PortalLayout() {
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
-                  <img src="/logo.webp" alt="GesClub" className="h-8 w-auto" />
+                  <img src="/logo.png" alt="GesClub" className="h-8 w-auto" />
                   <span className="font-bold">GesClub</span>
                 </div>
                 <nav className="flex flex-col gap-1">
@@ -85,7 +85,7 @@ export default function PortalLayout() {
             </Sheet>
 
             <Link to="/portal" className="flex items-center gap-2">
-              <img src="/logo.webp" alt="GesClub" className="h-8 w-auto" />
+              <img src="/logo.png" alt="GesClub" className="h-8 w-auto" />
               <span className="font-bold text-lg hidden sm:block">GesClub</span>
             </Link>
           </div>

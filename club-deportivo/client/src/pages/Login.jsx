@@ -53,7 +53,7 @@ export default function Login() {
           className="text-center mb-8"
         >
           <div className="mx-auto mb-4 flex items-center justify-center">
-            <img src="/logo.webp" alt="GesClub" className="h-16 w-auto" />
+            <img src="/logo.png" alt="GesClub" className="h-16 w-auto" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">GesClub</h1>
           <p className="text-gray-600 dark:text-gray-400">Sistema de Gestión</p>

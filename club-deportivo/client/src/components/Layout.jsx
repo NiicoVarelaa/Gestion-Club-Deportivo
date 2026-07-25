@@ -67,7 +67,7 @@ export default function Layout() {
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b px-6 py-4">
             <div className="flex items-center gap-2">
-              <img src="/logo.webp" alt="GesClub" className="h-8 w-auto" />
+              <img src="/logo.png" alt="GesClub" className="h-8 w-auto" />
               <h1 className="text-xl font-bold text-primary hidden sm:block">GesClub</h1>
             </div>
             <Button size="icon" variant="ghost" onClick={closeSidebar} className="lg:hidden">
