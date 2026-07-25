@@ -37,9 +37,7 @@ export default function Landing() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-white font-bold text-sm">GC</span>
-            </div>
+            <img src="/logo.webp" alt="GesClub" className="h-8 w-auto" />
             <span className="font-bold text-lg hidden sm:block">GesClub</span>
           </motion.div>
           <div className="flex items-center gap-4">
