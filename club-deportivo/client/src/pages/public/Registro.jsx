@@ -131,12 +131,12 @@ export default function Registro() {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <Card className="overflow-hidden shadow-2xl border-0">
-            <div className="bg-gradient-to-r from-primary to-blue-700 px-8 py-10 text-white text-center">
-              <div className="flex justify-center mb-4">
-                <img src="/logo.png" alt="GesClub" className="h-14 w-auto" />
+            <div className="bg-gradient-to-r from-primary to-blue-700 px-6 py-7 text-white text-center">
+              <div className="flex justify-center mb-2">
+                <img src="/logo.png" alt="GesClub" className="h-12 w-auto" />
               </div>
               <CardTitle className="text-2xl">Asociate ahora</CardTitle>
-              <CardDescription className="text-blue-100 mt-1">
+              <CardDescription className="text-blue-100">
                 Completá tus datos y empezá a entrenar
               </CardDescription>
             </div>
