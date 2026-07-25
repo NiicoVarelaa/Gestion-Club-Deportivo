@@ -109,7 +109,7 @@ export default function Registro() {
   ]
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 py-12 px-4">
+    <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 py-4 px-4">
       <div className="w-full max-w-lg">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -118,7 +118,7 @@ export default function Registro() {
         >
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-2 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al inicio
@@ -131,23 +131,23 @@ export default function Registro() {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <Card className="overflow-hidden shadow-2xl border-0">
-            <div className="bg-gradient-to-r from-primary to-blue-700 px-6 py-7 text-white text-center">
-              <div className="flex justify-center mb-2">
-                <img src="/logo.png" alt="GesClub" className="h-12 w-auto" />
+            <div className="bg-gradient-to-r from-primary to-blue-700 px-6 py-5 text-white text-center">
+              <div className="flex justify-center mb-1">
+                <img src="/logo.png" alt="GesClub" className="h-10 w-auto" />
               </div>
-              <CardTitle className="text-2xl">Asociate ahora</CardTitle>
+              <CardTitle className="text-xl">Asociate ahora</CardTitle>
               <CardDescription className="text-blue-100">
                 Completá tus datos y empezá a entrenar
               </CardDescription>
             </div>
 
-            <CardContent className="p-8">
+            <CardContent className="p-6">
               <motion.form
                 key={shakeKey}
                 animate={submitError ? { x: [0, -8, 8, -8, 8, -4, 4, 0] } : {}}
                 transition={{ duration: 0.4 }}
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-5"
+                className="space-y-3"
               >
                 {submitError && (
                   <motion.div
@@ -168,7 +168,7 @@ export default function Registro() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 + index * 0.05 }}
                     >
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
                         {label}
                       </label>
                       <div className="relative">
@@ -177,7 +177,7 @@ export default function Registro() {
                           type={type}
                           placeholder={placeholder}
                           {...register(name)}
-                          className={`w-full h-11 pl-10 pr-4 rounded-xl border text-base bg-transparent outline-none transition-all
+                          className={`w-full h-10 pl-10 pr-4 rounded-xl border text-sm bg-transparent outline-none transition-all
                             ${errors[name]
                               ? 'border-red-300 dark:border-red-700'
                               : 'border-gray-200 dark:border-gray-700 focus:border-gray-300 dark:focus:border-gray-600'
@@ -204,7 +204,7 @@ export default function Registro() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + fields.length * 0.05 }}
                 >
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
                     Contraseña
                   </label>
                   <div className="relative">
@@ -213,7 +213,7 @@ export default function Registro() {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Mínimo 8 caracteres"
                       {...register('password')}
-                      className={`w-full h-11 pl-10 pr-10 rounded-xl border text-base bg-transparent outline-none transition-all
+                      className={`w-full h-10 pl-10 pr-10 rounded-xl border text-sm bg-transparent outline-none transition-all
                         ${errors.password
                           ? 'border-red-300 dark:border-red-700'
                           : 'border-gray-200 dark:border-gray-700 focus:border-gray-300 dark:focus:border-gray-600'
@@ -249,7 +249,7 @@ export default function Registro() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base hover:bg-primary/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full h-11 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
@@ -267,7 +267,7 @@ export default function Registro() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-6 text-center"
+                className="mt-4 text-center"
               >
                 <p className="text-sm text-muted-foreground">
                   ¿Ya sos socio?{' '}
