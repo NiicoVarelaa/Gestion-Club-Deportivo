@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./club-deportivo/client/public/logo.png" alt="GesClub" width="120" />
+</div>
+
 # GesClub — Sistema de Gestión Deportiva
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs)](https://nodejs.org/)
