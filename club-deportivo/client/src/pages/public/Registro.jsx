@@ -133,7 +133,7 @@ export default function Registro() {
           <Card className="overflow-hidden shadow-2xl border-0">
             <div className="bg-gradient-to-r from-primary to-blue-700 px-8 py-10 text-white text-center">
               <div className="flex justify-center mb-4">
-                <img src="/logo.webp" alt="GesClub" className="h-12 w-auto brightness-0 invert" />
+                <img src="/logo.webp" alt="GesClub" className="h-14 w-auto" />
               </div>
               <CardTitle className="text-2xl">Asociate ahora</CardTitle>
               <CardDescription className="text-blue-100 mt-1">
