@@ -2,7 +2,7 @@
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express)](https://expressjs.com/)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react)](https://react.dev/)
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?logo=tailwindcss)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-2.49-3FCF8E?logo=supabase)](https://supabase.com/)
@@ -168,8 +168,8 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 | API | Express 4.21 + cors + helmet + compression + rate-limit |
 | ORM | Prisma 6.5 (PostgreSQL) |
 | Validación | Zod 3.24 (server + client) |
-| Auth | Supabase Auth + `@supabase/auth-ui-react` |
-| Frontend | React 18.3 + Vite 8 + Tailwind CSS 3.4 |
+| Auth | Supabase Auth |
+| Frontend | React 19.0 + Vite 8 + Tailwind CSS 3.4 |
 | Estado | Zustand 5 + React Query 5 |
 | Formularios | React Hook Form 7 + `@hookform/resolvers` |
 | Animaciones | Framer Motion 12 |
@@ -512,7 +512,7 @@ En el dashboard de Supabase, ir a **Authentication > URL Configuration**:
 
 ## Decisiones Técnicas
 
-- **React 18.3** (no 19): `@supabase/auth-ui-react` no soporta React 19 aún
+- **React 19.0**: upgrade desde React 18.3, eliminando `@supabase/auth-ui-react` que bloqueaba la actualización
 - **pnpm 11.1** pineado en `package.json` con `packageManager` para compatibilidad con Vercel
 - **Prisma** como ORM por type-safety y migraciones; Supabase para queries runtime
 - **Framer Motion** para animaciones de la landing (staggered reveals, hover effects, parallax nav)
