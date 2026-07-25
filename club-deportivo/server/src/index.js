@@ -26,7 +26,18 @@ app.use(cors({
   credentials: true,
 }));
 app.use(compression());
-app.use(pinoHttp({ logger }));
+app.use(pinoHttp({
+  logger,
+  serializers: {
+    req: (req) => ({
+      method: req.method,
+      url: req.url,
+    }),
+    res: (res) => ({
+      statusCode: res.statusCode,
+    }),
+  },
+}));
 app.use(express.json());
 
 const limiter = rateLimit({
