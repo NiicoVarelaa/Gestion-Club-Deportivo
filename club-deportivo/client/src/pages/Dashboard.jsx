@@ -31,7 +31,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+    <div className="space-y-4">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Resumen del club deportivo</p>
@@ -69,7 +69,7 @@ export default function Dashboard() {
         <p className="text-muted-foreground">Resumen del club deportivo</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat) => (
           <Card key={stat.key}>
             <CardContent className="p-4 sm:p-6">
@@ -87,7 +87,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center gap-2 space-y-0 pb-2">
             <TrendingUp className="h-5 w-5 text-emerald-600" />
@@ -109,7 +109,7 @@ export default function Dashboard() {
             <CardTitle className="text-lg">Pagos Pendientes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-6 sm:gap-8">
+            <div className="flex gap-4 sm:gap-6">
               <div>
                 <p className="text-xl sm:text-2xl font-bold text-amber-600">{data.pagosPendientes ?? 0}</p>
                 <p className="text-xs sm:text-sm text-muted-foreground">Pendientes</p>
@@ -123,7 +123,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Estado de Pagos</CardTitle>
@@ -134,7 +134,7 @@ export default function Dashboard() {
                 <figcaption className="sr-only">
                   Estado de pagos: {paymentData.map((d) => `${d.name}: ${d.value}`).join(', ')}
                 </figcaption>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={220}>
                   <PieChart
                     role="img"
                     aria-label={`Estado de pagos: ${paymentData.map((d) => `${d.name}: ${d.value}`).join(', ')}`}
