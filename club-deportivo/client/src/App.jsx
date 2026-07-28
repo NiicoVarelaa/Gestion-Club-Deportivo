@@ -5,6 +5,8 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Landing from './pages/public/Landing'
 import Registro from './pages/public/Registro'
+import Terminos from './pages/public/Terminos'
+import Privacidad from './pages/public/Privacidad'
 import ForgotPassword from './pages/public/ForgotPassword'
 import ResetPassword from './pages/public/ResetPassword'
 import PortalLayout from './pages/portal/PortalLayout'
@@ -55,6 +57,8 @@ export default function App() {
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
       <Route path="/registro" element={<Registro />} />
+      <Route path="/terminos" element={<Terminos />} />
+      <Route path="/privacidad" element={<Privacidad />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 

@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
 import { useTheme } from './ThemeProvider'
+import Footer from './Footer'
 import {
   LayoutDashboard,
   Users,
@@ -149,8 +150,11 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 sm:p-6">
+            <Outlet />
+          </div>
+          <Footer />
         </main>
       </div>
     </div>

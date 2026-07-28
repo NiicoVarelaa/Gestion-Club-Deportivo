@@ -3,6 +3,7 @@ import { motion, useScroll } from 'framer-motion'
 import HeroSection from '@/components/landings/HeroSection'
 import SportsGrid from '@/components/landings/SportsGrid'
 import BenefitsSection from '@/components/landings/BenefitsSection'
+import Footer from '@/components/Footer'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
@@ -76,19 +77,7 @@ export default function Landing() {
         <BenefitsSection />
       </div>
 
-      <footer className="py-12 bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="container mx-auto px-6 text-center"
-        >
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} GesClub. Todos los derechos reservados.
-          </p>
-        </motion.div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
+import Footer from '@/components/Footer'
 
 const navItems = [
   { to: '/portal', label: 'Inicio', icon: LayoutDashboard },
@@ -120,6 +121,7 @@ export default function PortalLayout() {
       <main className="container mx-auto px-4 py-8">
         <Outlet />
       </main>
+      <Footer />
     </div>
   )
 }
