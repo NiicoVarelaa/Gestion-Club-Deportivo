@@ -1,14 +1,17 @@
-import { useState } from 'react'
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useSocioStore } from '@/stores/socioStore'
 import { useAuthStore } from '@/stores/authStore'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import Footer from '@/components/Footer'
 import { useTheme } from '@/components/ThemeProvider'
-import { cn } from '@/lib/utils'
-import { Menu, X, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
+import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
 
 const navItems = [
   { to: '/portal', label: 'Inicio', icon: LayoutDashboard, end: true },
@@ -17,8 +20,36 @@ const navItems = [
   { to: '/portal/perfil', label: 'Perfil', icon: User },
 ]
 
+function NavLinks({ location, deuda }) {
+  return (
+    <>
+      {navItems.map(({ to, label, icon: Icon, end }) => {
+        const isActive = end ? location.pathname === to : location.pathname.startsWith(to)
+        return (
+          <Link
+            key={to}
+            to={to}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+            {label === 'Pagos' && deuda?.total > 0 && (
+              <Badge variant="destructive" className="ml-1 scale-75">
+                {deuda.cantidadMeses}
+              </Badge>
+            )}
+          </Link>
+        )
+      })}
+    </>
+  )
+}
+
 export default function PortalLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const { socio, deuda } = useSocioStore()
   const { logout: authLogout } = useAuthStore()
@@ -30,106 +61,41 @@ export default function PortalLayout() {
     window.location.href = '/portal'
   }
 
-  const closeSidebar = () => setSidebarOpen(false)
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev)
-
   const initials = `${socio?.nombre?.[0] || ''}${socio?.apellido?.[0] || ''}`
 
-  const currentPage = navItems.find(
-    (item) => (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
-  )?.label
-
-  const isActive = (item) =>
-    item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)
-
   return (
-    <div className="flex h-dvh bg-muted/40">
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black/50 lg:hidden"
-          onClick={closeSidebar}
-        />
-      )}
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sheet>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-4">
+                <div className="flex items-center gap-2 mb-6">
+                  <img src="/logo.png" alt="GesClub" className="h-7 w-auto" />
+                  <span className="font-bold">GesClub</span>
+                </div>
+                <nav className="flex flex-col gap-1">
+                  <NavLinks location={location} deuda={deuda} />
+                </nav>
+              </SheetContent>
+            </Sheet>
 
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-30 w-64 transform border-r bg-background shadow-sm transition-transform duration-200 lg:static lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b px-4 py-3">
             <Link to="/portal" className="flex items-center gap-2">
               <img src="/logo.png" alt="GesClub" className="h-7 w-auto" />
-              <span className="font-bold text-base">GesClub</span>
+              <span className="font-bold text-base hidden sm:block">GesClub</span>
             </Link>
-            <Button size="icon" variant="ghost" onClick={closeSidebar} className="lg:hidden">
-              <X className="h-5 w-5" />
-            </Button>
           </div>
 
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            {navItems.map((item) => {
-              const active = isActive(item)
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={closeSidebar}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    active
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="flex-1">{item.label}</span>
-                  {item.label === 'Pagos' && deuda?.total > 0 && (
-                    <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0">
-                      {deuda.cantidadMeses}
-                    </Badge>
-                  )}
-                </Link>
-              )
-            })}
+          <nav className="hidden md:flex items-center gap-1">
+            <NavLinks location={location} deuda={deuda} />
           </nav>
 
-          <div className="border-t px-3 py-4">
-            <div className="flex items-center gap-3 mb-3 px-3">
-              <Avatar className="h-9 w-9 ring-2 ring-primary/20">
-                <AvatarFallback className="bg-primary text-white text-xs">
-                  {initials || '?'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="truncate min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {socio?.nombre ? `${socio.nombre} ${socio.apellido || ''}` : 'Socio'}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">{socio?.email}</p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5" />
-              Cerrar sesión
-            </Button>
-          </div>
-        </div>
-      </aside>
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center gap-3 border-b bg-background px-4 py-3 sm:px-6 sm:py-4">
-          <Button size="icon" variant="ghost" onClick={toggleSidebar} className="lg:hidden shrink-0">
-            <Menu className="h-5 w-5" />
-          </Button>
-          {currentPage && (
-            <span className="text-sm font-medium text-muted-foreground lg:hidden">{currentPage}</span>
-          )}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -137,18 +103,25 @@ export default function PortalLayout() {
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
+            <Link to="/portal/perfil">
+              <Avatar className="h-9 w-9 ring-2 ring-primary/20 cursor-pointer">
+                <AvatarFallback className="bg-primary text-white text-sm">
+                  {initials || '?'}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Salir</span>
+            </Button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <main className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4 sm:p-6">
-              <Outlet />
-            </div>
-          </div>
-          <Footer />
-        </main>
-      </div>
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <Outlet />
+      </main>
+      <Footer />
     </div>
   )
 }
