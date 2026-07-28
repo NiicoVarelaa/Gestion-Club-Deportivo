@@ -17,7 +17,8 @@ export default function Login() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard')
+      const isAdmin = user.user_metadata?.role === 'admin'
+      navigate(isAdmin ? '/admin/dashboard' : '/portal')
     }
   }, [user, loading, navigate])
 

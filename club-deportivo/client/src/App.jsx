@@ -35,6 +35,7 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuthStore()
   if (loading) return <PageLoader />
   if (!user) return <Navigate to="/login" />
+  if (user.user_metadata?.role !== 'admin') return <Navigate to="/portal" />
   return children
 }
 
