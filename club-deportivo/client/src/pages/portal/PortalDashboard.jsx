@@ -8,6 +8,7 @@ import { AlertTriangle, Dumbbell, CalendarCheck, TrendingUp } from 'lucide-react
 
 export default function PortalDashboard() {
   const { socio, deportes, pagos, deuda, loading, fetchPortalData } = useSocioStore()
+  const deporteMap = new Map((deportes || []).map((d) => [d.id, d.nombre]))
 
   useEffect(() => {
     fetchPortalData()
@@ -158,7 +159,7 @@ export default function PortalDashboard() {
                       <td className="py-3 px-4 text-sm">
                         {MESES[p.mes - 1]} {p.anio}
                       </td>
-                      <td className="py-3 px-4 text-sm">{p.deporteId?.slice(0, 8)}...</td>
+                      <td className="py-3 px-4 text-sm">{deporteMap.get(p.deporteId) || '—'}</td>
                       <td className="py-3 px-4 text-sm text-right">{formatCurrency(parseFloat(p.monto))}</td>
                       <td className="py-3 px-4 text-center">
                         <Badge

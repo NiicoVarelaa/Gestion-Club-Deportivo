@@ -150,9 +150,11 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6">
-            <Outlet />
+        <main className="flex-1 flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <Outlet />
+            </div>
           </div>
           <Footer />
         </main>

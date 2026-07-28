@@ -8,7 +8,8 @@ import { formatCurrency, MESES } from '@/lib/utils'
 import { AlertTriangle, CreditCard, TrendingUp } from 'lucide-react'
 
 export default function PortalPagos() {
-  const { pagos, deuda, loading, fetchPortalData } = useSocioStore()
+  const { pagos, deportes, deuda, loading, fetchPortalData } = useSocioStore()
+  const deporteMap = new Map((deportes || []).map((d) => [d.id, d.nombre]))
 
   useEffect(() => {
     fetchPortalData()
@@ -99,6 +100,7 @@ export default function PortalPagos() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Mes</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Deporte</th>
                     <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Monto</th>
                     <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Estado</th>
                   </tr>
@@ -108,6 +110,9 @@ export default function PortalPagos() {
                     <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                       <td className="py-3 px-4 text-sm font-medium">
                         {MESES[p.mes - 1]} {p.anio}
+                      </td>
+                      <td className="py-3 px-4 text-sm">
+                        {deporteMap.get(p.deporteId) || '—'}
                       </td>
                       <td className="py-3 px-4 text-sm text-right">
                         {formatCurrency(parseFloat(p.monto))}
