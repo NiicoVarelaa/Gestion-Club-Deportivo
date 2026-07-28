@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import Footer from '@/components/Footer'
 import { useTheme } from '@/components/ThemeProvider'
 import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
 
@@ -121,7 +120,6 @@ export default function PortalLayout() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <Outlet />
       </main>
-      <Footer />
     </div>
   )
 }
