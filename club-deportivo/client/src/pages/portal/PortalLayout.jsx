@@ -13,7 +13,7 @@ import { useTheme } from '@/components/ThemeProvider'
 import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
 
 const navItems = [
-  { to: '/portal', label: 'Inicio', icon: LayoutDashboard, end: true },
+  { to: '/portal', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/portal/deportes', label: 'Mis Deportes', icon: Dumbbell },
   { to: '/portal/pagos', label: 'Pagos', icon: CreditCard },
   { to: '/portal/perfil', label: 'Perfil', icon: User },
