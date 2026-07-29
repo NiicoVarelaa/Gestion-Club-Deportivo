@@ -33,8 +33,8 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 ## Screenshots
 
-> Las capturas de **Desktop** muestran el panel de administración en modo Light y Dark.
-> Las capturas de **Mobile** muestran la experiencia responsive en dispositivo móvil.
+> Las capturas de **Desktop** muestran el panel en modo Light y Dark.
+> Las capturas de **Mobile** muestran la experiencia responsive.
 
 ---
 
@@ -46,73 +46,83 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 **Mobile:**
 
-![Landing Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.webp)
+![Landing Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Landing-Mobile.webp)
 
 ---
 
-### Login
+### Panel de Administración
+
+#### Login
 
 | Desktop | Mobile |
 |:-------:|:------:|
 | ![Login Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Login-Desktop.webp) | ![Login Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.webp) |
 
----
-
-### Registro Público
+#### Registro Público
 
 | Desktop | Mobile |
 |:-------:|:------:|
 | ![Registro Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Registro-Desktop.webp) | ![Registro Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.webp) |
 
----
-
-### Dashboard
+#### Dashboard
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Dashboard Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.webp) | ![Dashboard Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.webp) | ![Dashboard Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile.webp) |
+| ![Dashboard Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.webp) | ![Dashboard Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.webp) | ![Dashboard Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Admin-Dashboard.webp) |
 
----
-
-### Socios
+#### Socios
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Socios Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.webp) | ![Socios Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.webp) | ![Socios Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile.webp) |
+| ![Socios Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.webp) | ![Socios Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.webp) | ![Socios Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Admin-Socios.webp) |
 
----
-
-### Deportes
+#### Deportes
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Deportes Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.webp) | ![Deportes Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.webp) | ![Deportes Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile.webp) |
+| ![Deportes Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.webp) | ![Deportes Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.webp) | ![Deportes Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Admin-Deportes.webp) |
 
----
-
-### Inscripciones
+#### Inscripciones
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Inscripciones Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.webp) | ![Inscripciones Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.webp) | ![Inscripciones Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile.webp) |
+| ![Inscripciones Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.webp) | ![Inscripciones Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.webp) | ![Inscripciones Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Admin-Inscripciones.webp) |
 
----
-
-### Pagos
+#### Pagos
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Pagos Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.webp) | ![Pagos Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.webp) | ![Pagos Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile.webp) |
+| ![Pagos Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.webp) | ![Pagos Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.webp) | ![Pagos Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Admin-Pagos.webp) |
 
 ---
 
-### Portal del Socio — Perfil
+### Portal del Socio
+
+#### Dashboard
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| ![Socio Perfil Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Perfil.webp) | — |
+| ![Socio Dashboard](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Dashboard.webp) | ![Socio Dashboard Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socio-Dashboard.webp) |
 
-El perfil del socio es **editable**: desde el portal, el usuario puede modificar su nombre, apellido y teléfono. DNI, email y fecha de alta son solo lectura por seguridad.
+#### Deportes
+
+| Desktop | Mobile |
+|:-------:|:------:|
+| ![Socio Deportes](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Deportes.webp) | ![Socio Deportes Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socio-Deportes.webp) |
+
+#### Pagos
+
+| Desktop | Mobile |
+|:-------:|:------:|
+| ![Socio Pagos](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Pagos.webp) | ![Socio Pagos Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socio-Pagos.webp) |
+
+#### Perfil
+
+| Desktop | Mobile |
+|:-------:|:------:|
+| ![Socio Perfil](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Perfil.webp) | ![Socio Perfil Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socio-Perfil.webp) |
+
+El perfil del socio es **editable**: nombre, apellido y teléfono se pueden modificar desde el portal. DNI, email y fecha de alta son solo lectura por seguridad.
 
 ---
 
