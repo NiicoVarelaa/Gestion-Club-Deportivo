@@ -37,4 +37,5 @@ export const publicService = {
 export const portalService = {
   login: (email, password) => api.post('/auth/login', { email, password }),
   getPortalData: () => api.get('/portal/me'),
+  updateProfile: (data) => api.put('/portal/me', data),
 }

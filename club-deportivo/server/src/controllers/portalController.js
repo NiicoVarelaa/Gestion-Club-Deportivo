@@ -1,5 +1,6 @@
 import { getSupabase } from '../utils/supabase.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { updatePortalProfileSchema } from '../utils/validations.js';
 
 export const getPortalData = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
@@ -56,4 +57,28 @@ export const getPortalData = asyncHandler(async (req, res) => {
       cantidadMeses: deuda.length,
     },
   });
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const supabase = getSupabase();
+  const userId = req.user.id;
+  const validated = updatePortalProfileSchema.parse(req.body);
+
+  const { data: socio } = await supabase
+    .from('Socio')
+    .select('id')
+    .eq('supabaseUserId', userId)
+    .single();
+
+  if (!socio) return res.status(404).json({ error: 'Socio no encontrado' });
+
+  const { data, error } = await supabase
+    .from('Socio')
+    .update(validated)
+    .eq('id', socio.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  res.json({ data });
 });

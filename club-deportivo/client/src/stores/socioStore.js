@@ -32,6 +32,8 @@ export const useSocioStore = create((set, get) => ({
     }
   },
 
+  updateSocio: (socio) => set({ socio }),
+
   logout: () => {
     localStorage.removeItem('socio_token')
     set({ socio: null, deportes: [], pagos: [], deuda: null, error: null, initialized: false })

@@ -58,6 +58,12 @@ export const registroSchema = z.object({
   password: z.string().min(8).regex(/[A-Z]/, 'Al menos una mayuscula').regex(/[0-9]/, 'Al menos un numero'),
 });
 
+export const updatePortalProfileSchema = z.object({
+  nombre: stringField(2, 100),
+  apellido: stringField(2, 100),
+  telefono: z.string().max(20).optional().or(z.literal('')),
+});
+
 export const socioLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
