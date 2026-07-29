@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatDate } from '@/lib/utils'
-import { User, Mail, Phone, Hash, Calendar, Pencil, Loader2 } from 'lucide-react'
+import { User, Mail, Phone, Calendar, Pencil, Loader2, Badge as BadgeIcon } from 'lucide-react'
 
 export default function PortalPerfil() {
   const { socio, loading, fetchPortalData, updateSocio } = useSocioStore()
@@ -70,7 +70,7 @@ export default function PortalPerfil() {
   }
 
   const infoItems = [
-    { icon: Hash, label: 'DNI', value: socio?.dni },
+    { icon: BadgeIcon, label: 'DNI', value: socio?.dni },
     { icon: Mail, label: 'Email', value: socio?.email },
     { icon: Calendar, label: 'Fecha de alta', value: socio?.fechaAlta ? formatDate(socio.fechaAlta) : '—' },
   ]
