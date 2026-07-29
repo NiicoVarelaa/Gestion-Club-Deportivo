@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./club-deportivo/client/public/logo.webp" alt="GesClub" width="120" />
+  <img src="./logo-readme.webp" alt="GesClub" width="120" />
 </div>
 
 # GesClub — Sistema de Gestión Deportiva
