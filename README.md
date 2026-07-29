@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./club-deportivo/client/public/logo.png" alt="GesClub" width="120" />
+  <img src="./club-deportivo/client/public/logo.webp" alt="GesClub" width="120" />
 </div>
 
 # GesClub — Sistema de Gestión Deportiva
@@ -42,11 +42,11 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 **Desktop:**
 
-![Landing 1](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-1.png) ![Landing 2](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-2.png) ![Landing 3](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-3.png)
+![Landing 1](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-1.webp) ![Landing 2](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-2.webp) ![Landing 3](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Landing-Page-3.webp)
 
 **Mobile:**
 
-![Landing Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.png)
+![Landing Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Landing-Page-Mobile.webp)
 
 ---
 
@@ -54,7 +54,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| ![Login Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Login-Desktop.png) | ![Login Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.png) |
+| ![Login Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Login-Desktop.webp) | ![Login Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Login-Mobile.webp) |
 
 ---
 
@@ -62,7 +62,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Desktop | Mobile |
 |:-------:|:------:|
-| ![Registro Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Registro-Desktop.png) | ![Registro Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.png) |
+| ![Registro Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Registro-Desktop.webp) | ![Registro Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Registro-Mobile.webp) |
 
 ---
 
@@ -70,7 +70,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Dashboard Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.png) | ![Dashboard Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.png) | ![Dashboard Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile.png) |
+| ![Dashboard Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Light.webp) | ![Dashboard Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Dashboard-Desktop-Dark.webp) | ![Dashboard Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Dashboard-Mobile.webp) |
 
 ---
 
@@ -78,7 +78,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Socios Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.png) | ![Socios Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.png) | ![Socios Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile.png) |
+| ![Socios Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Light.webp) | ![Socios Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socios-Desktop-Dark.webp) | ![Socios Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Socios-Mobile.webp) |
 
 ---
 
@@ -86,7 +86,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Deportes Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.png) | ![Deportes Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.png) | ![Deportes Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile.png) |
+| ![Deportes Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Light.webp) | ![Deportes Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Deportes-Desktop-Dark.webp) | ![Deportes Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Deportes-Mobile.webp) |
 
 ---
 
@@ -94,7 +94,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Inscripciones Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.png) | ![Inscripciones Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.png) | ![Inscripciones Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile.png) |
+| ![Inscripciones Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Light.webp) | ![Inscripciones Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Inscripciones-Desktop-Dark.webp) | ![Inscripciones Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Inscripciones-Mobile.webp) |
 
 ---
 
@@ -102,7 +102,27 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 
 | Light | Dark | Mobile |
 |:-----:|:----:|:------:|
-| ![Pagos Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.png) | ![Pagos Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.png) | ![Pagos Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile.png) |
+| ![Pagos Light](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Light.webp) | ![Pagos Dark](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Pagos-Desktop-Dark.webp) | ![Pagos Mobile](./club-deportivo/screenshots/Club%20Deportes%20-%20Mobile/Pagos-Mobile.webp) |
+
+---
+
+### Portal del Socio — Perfil
+
+| Desktop | Mobile |
+|:-------:|:------:|
+| ![Socio Perfil Desktop](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/Socio-Perfil.webp) | — |
+
+El perfil del socio es **editable**: desde el portal, el usuario puede modificar su nombre, apellido y teléfono. DNI, email y fecha de alta son solo lectura por seguridad.
+
+---
+
+### Recuperar Contraseña
+
+| Paso 1 | Paso 2 |
+|:------:|:------:|
+| ![Recuperar 1](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/RecuperarContrase%C3%B1a-1.webp) | ![Recuperar 2](./club-deportivo/screenshots/Club%20Deportes%20-%20Desktop/RecuperarContrase%C3%B1a-2.webp) |
+
+Flujo completo de recuperación de contraseña con envío de email vía Supabase Auth + SMTP personalizado.
 
 ---
 
@@ -117,7 +137,7 @@ Sistema full-stack para administrar un club deportivo. Incluye **landing page p�
 - Dashboard personal con estado de cuenta, deportes activos, progreso de pagos y alerta de deudas
 - Vista de mis deportes con fecha de inscripción y cuota mensual
 - Historial de pagos con estados PAGADO/PENDIENTE/VENCIDO y progreso anual
-- Perfil con datos personales y estado de membresía
+- **Perfil editable**: nombre, apellido y teléfono editables desde el portal; DNI y email como solo lectura
 - Navegación responsive con Sheet (menú lateral) en mobile
 
 ### Panel de Administración
@@ -236,6 +256,10 @@ club-deportivo/
 | ---- | ----------- |
 | `/` | Landing page con hero + disciplinas |
 | `/registro` | Formulario de inscripción |
+| `/terminos` | Términos y condiciones |
+| `/privacidad` | Política de privacidad |
+| `/forgot-password` | Recuperación de contraseña |
+| `/reset-password` | Restablecer contraseña |
 
 ### Portal del Socio (requiere auth)
 | Ruta | Descripción |
@@ -272,6 +296,7 @@ club-deportivo/
 | Método | Ruta | Descripción |
 | ------ | ---- | ----------- |
 | `GET` | `/api/portal/me` | Datos del socio logueado |
+| `PUT` | `/api/portal/me` | Actualizar perfil del socio (nombre, apellido, teléfono) |
 
 ### Socios (admin)
 | Método | Ruta | Descripción | Query params |
@@ -454,6 +479,9 @@ pnpm build               # Build de producción (frontend)
 pnpm db:generate         # Generar Prisma Client
 pnpm db:push             # Sincronizar schema a Supabase
 pnpm db:migrate          # Crear migración
+
+# Seed
+pnpm -F server seed-demo  # Carga datos demo (socio, deportes, pagos)
 
 # Tests
 pnpm -F server test:run  # Tests del backend (19 tests)
