@@ -6,12 +6,11 @@ import { toast } from 'sonner'
 import { pagosService, sociosService, deportesService } from '../services'
 import { pagoSchema } from '../schemas'
 import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard, FileDown } from 'lucide-react'
-import { formatCurrency, formatDate, MESES } from '../lib/utils'
+import { formatCurrency, formatDate, MESES, selectClassName } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Badge } from '../components/ui/badge'
-import { Card, CardContent } from '../components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -27,12 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table'
-import { TableSkeleton } from '../components/Skeleton'
-import Pagination from '../components/Pagination'
-import EmptyState from '../components/EmptyState'
+import DataTable from '../components/DataTable'
+import SocioSelect from '../components/SocioSelect'
 import { exportToPDF, exportToExcel, pagosExportColumns, formatPagoForExport } from '../lib/export'
-
-const selectStyles = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 
 const estadoIcon = {
   PAGADO: CheckCircle,
@@ -59,8 +55,7 @@ export default function Pagos() {
   const [selectedSocio, setSelectedSocio] = useState(null)
   const [filterEstado, setFilterEstado] = useState('')
   const [page, setPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [socioSelectKey, setSocioSelectKey] = useState(0)
   const limit = 15
 
   const now = new Date()
@@ -129,26 +124,25 @@ export default function Pagos() {
 
   const selectSocio = (socio) => {
     setSelectedSocio(socio.id)
-    setSearchTerm(`${socio.nombre} ${socio.apellido}`)
     setValue('socioId', socio.id)
-    setDropdownOpen(false)
     if (socio.id) refetchDeudas()
   }
 
   const clearSocio = () => {
     setSelectedSocio(null)
-    setSearchTerm('')
     setValue('socioId', '')
-    setDropdownOpen(false)
   }
 
   const pagos = pagosData?.data || []
   const sociosList = socios?.data || []
   const deportesList = deportes?.data || []
-  const filteredSocios = sociosList.filter(s =>
-    `${s.nombre} ${s.apellido}`.toLowerCase().includes(searchTerm.toLowerCase())
-  )
   const pagination = pagosData?.pagination
+
+  const resetDialog = () => {
+    reset()
+    setSelectedSocio(null)
+    setSocioSelectKey((k) => k + 1)
+  }
 
   const handleExportPDF = () => {
     const cols = pagosExportColumns()
@@ -184,7 +178,7 @@ export default function Pagos() {
             <RefreshCw className="h-4 w-4" />
             Generar Cuotas
           </Button>
-          <Button onClick={() => { reset(); setModalOpen(true) }} size="sm">
+          <Button onClick={() => { resetDialog(); setModalOpen(true) }} size="sm">
             <Plus className="h-4 w-4" />
             Registrar Pago
           </Button>
@@ -205,127 +199,80 @@ export default function Pagos() {
         ))}
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <TableSkeleton rows={8} cols={6} />
-          ) : pagos.length === 0 ? (
-            <EmptyState
-              icon={CreditCard}
-              title="No hay pagos registrados"
-              description={filterEstado ? 'No hay pagos con ese estado.' : 'Todavia no se registraron pagos en el sistema.'}
-              action={!filterEstado ? { label: 'Generar Cuotas', onClick: () => generateMutation.mutate() } : undefined}
-            />
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Socio</TableHead>
-                      <TableHead className="hidden sm:table-cell">Deporte</TableHead>
-                      <TableHead>Periodo</TableHead>
-                      <TableHead>Monto</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="hidden md:table-cell">Fecha Pago</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pagos.map((pago) => {
-                      const Icon = estadoIcon[pago.estado]
-                      const iconColor = pago.estado === 'PAGADO' ? 'text-emerald-600' : pago.estado === 'PENDIENTE' ? 'text-amber-600' : 'text-destructive'
-                      return (
-                        <TableRow key={pago.id}>
-                          <TableCell className="font-medium">
-                            {pago.socio?.nombre} {pago.socio?.apellido}
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">{pago.deporte?.nombre}</TableCell>
-                          <TableCell className="text-muted-foreground whitespace-nowrap">
-                            {MESES[pago.mes - 1]?.slice(0, 3)} {pago.anio}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatCurrency(pago.monto)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={estadoVariant[pago.estado]} className="gap-1">
-                              <Icon className={`h-3 w-3 ${iconColor}`} />
-                              <span className="hidden xs:inline">{pago.estado}</span>
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground">
-                            {pago.fechaPago ? formatDate(pago.fechaPago) : '-'}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-              {pagination && (
-                <Pagination
-                  page={pagination.page}
-                  pages={pagination.pages}
-                  total={pagination.total}
-                  onPageChange={setPage}
-                />
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <DataTable
+        loading={isLoading}
+        skeleton={{ rows: 8, cols: 6 }}
+        isEmpty={pagos.length === 0}
+        emptyState={{
+          icon: CreditCard,
+          title: 'No hay pagos registrados',
+          description: filterEstado ? 'No hay pagos con ese estado.' : 'Todavia no se registraron pagos en el sistema.',
+          action: !filterEstado ? { label: 'Generar Cuotas', onClick: () => generateMutation.mutate() } : undefined,
+        }}
+        pagination={pagination}
+        onPageChange={setPage}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Socio</TableHead>
+              <TableHead className="hidden sm:table-cell">Deporte</TableHead>
+              <TableHead>Periodo</TableHead>
+              <TableHead>Monto</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead className="hidden md:table-cell">Fecha Pago</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pagos.map((pago) => {
+              const Icon = estadoIcon[pago.estado]
+              const iconColor = pago.estado === 'PAGADO' ? 'text-emerald-600' : pago.estado === 'PENDIENTE' ? 'text-amber-600' : 'text-destructive'
+              return (
+                <TableRow key={pago.id}>
+                  <TableCell className="font-medium">
+                    {pago.socio?.nombre} {pago.socio?.apellido}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{pago.deporte?.nombre}</TableCell>
+                  <TableCell className="text-muted-foreground whitespace-nowrap">
+                    {MESES[pago.mes - 1]?.slice(0, 3)} {pago.anio}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {formatCurrency(pago.monto)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={estadoVariant[pago.estado]} className="gap-1">
+                      <Icon className={`h-3 w-3 ${iconColor}`} />
+                      <span className="hidden xs:inline">{pago.estado}</span>
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
+                    {pago.fechaPago ? formatDate(pago.fechaPago) : '-'}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </DataTable>
 
-      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) { reset(); setSelectedSocio(null); setSearchTerm(''); setDropdownOpen(false) } }}>
+      <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) resetDialog() }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Registrar Pago</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="socioSearch">Socio</Label>
-                <div className="relative">
-                  <Input
-                    id="socioSearch"
-                    placeholder="Buscar socio por nombre o apellido..."
-                    value={searchTerm}
-                    onChange={(e) => { setSearchTerm(e.target.value); setDropdownOpen(true) }}
-                    onFocus={() => setDropdownOpen(true)}
-                    onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
-                  />
-                  {selectedSocio && (
-                    <button
-                      type="button"
-                      onClick={clearSocio}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      ✕
-                    </button>
-                  )}
-                  {dropdownOpen && (
-                    <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md max-h-48 overflow-y-auto">
-                      {filteredSocios.length === 0 ? (
-                        <p className="px-3 py-2 text-sm text-muted-foreground">Sin resultados</p>
-                      ) : (
-                        filteredSocios.map((s) => (
-                          <button
-                            key={s.id}
-                            type="button"
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-accent transition-colors"
-                            onMouseDown={(e) => { e.preventDefault(); selectSocio(s) }}
-                          >
-                            {s.nombre} {s.apellido}
-                            <span className="ml-2 text-xs text-muted-foreground">DNI {s.dni}</span>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-                {errors.socioId && <p className="text-sm text-destructive">{errors.socioId.message}</p>}
-              </div>
+              <SocioSelect
+                key={socioSelectKey}
+                socios={sociosList}
+                value={selectedSocio}
+                onSelect={selectSocio}
+                onClear={clearSocio}
+                error={errors.socioId?.message}
+              />
               <div className="space-y-2">
                 <Label htmlFor="deporteId">Deporte</Label>
-                <select id="deporteId" {...register('deporteId')} className={selectStyles} defaultValue="">
+                <select id="deporteId" {...register('deporteId')} className={selectClassName} defaultValue="">
                   <option value="" disabled>Seleccionar deporte</option>
                   {deportesList.map((d) => (
                     <option key={d.id} value={d.id}>{d.nombre}</option>
@@ -338,7 +285,7 @@ export default function Pagos() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="mes">Mes</Label>
-                <select id="mes" {...register('mes')} className={selectStyles}>
+                <select id="mes" {...register('mes')} className={selectClassName}>
                   {MESES.map((mes, i) => (
                     <option key={i} value={i + 1}>{mes.slice(0, 3)}</option>
                   ))}
@@ -370,7 +317,7 @@ export default function Pagos() {
             )}
 
             <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); reset(); setSelectedSocio(null); setSearchTerm(''); setDropdownOpen(false) }}>
+              <Button type="button" variant="secondary" onClick={() => { setModalOpen(false); resetDialog() }}>
                 Cancelar
               </Button>
               <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">

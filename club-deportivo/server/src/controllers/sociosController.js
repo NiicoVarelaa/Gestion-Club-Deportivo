@@ -1,6 +1,37 @@
 import { getSupabase } from '../utils/supabase.js';
 import { createSocioSchema, updateSocioSchema } from '../utils/validations.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { buildPagination } from '../utils/pagination.js';
+
+async function attachInscripciones(supabase, socios) {
+  if (!socios.length) return socios;
+
+  const { data: inscripciones } = await supabase
+    .from('Inscripcion')
+    .select('*')
+    .in('socioId', socios.map((s) => s.id))
+    .eq('activo', true);
+
+  const list = inscripciones || [];
+
+  let deporteMap = {};
+  const deporteIds = [...new Set(list.map((i) => i.deporteId))];
+  if (deporteIds.length > 0) {
+    const { data: deportes } = await supabase.from('Deporte').select('*').in('id', deporteIds);
+    deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+  }
+
+  for (const i of list) {
+    i.deporte = deporteMap[i.deporteId] || null;
+  }
+
+  const bySocio = new Map(socios.map((s) => [s.id, []]));
+  for (const i of list) {
+    bySocio.get(i.socioId)?.push(i);
+  }
+
+  return socios.map((s) => ({ ...s, inscripciones: bySocio.get(s.id) || [] }));
+}
 
 export const getSocios = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
@@ -19,40 +50,11 @@ export const getSocios = asyncHandler(async (req, res) => {
   const { data, count, error } = await query.range(from, to);
   if (error) throw error;
 
-  const inscripcionesPromises = (data || []).map(async (socio) => {
-    const { data: insc } = await supabase
-      .from('Inscripcion')
-      .select('*')
-      .eq('socioId', socio.id)
-      .eq('activo', true);
-
-    const list = insc || [];
-    if (list.length > 0) {
-      const deporteIds = [...new Set(list.map((i) => i.deporteId))];
-      const { data: deportes } = await supabase
-        .from('Deporte')
-        .select('*')
-        .in('id', deporteIds);
-
-      const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
-      for (const i of list) {
-        i.deporte = deporteMap[i.deporteId] || null;
-      }
-    }
-
-    return { ...socio, inscripciones: list };
-  });
-
-  const sociosWithInscripciones = await Promise.all(inscripcionesPromises);
+  const sociosWithInscripciones = await attachInscripciones(supabase, data || []);
 
   res.json({
     data: sociosWithInscripciones,
-    pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total: count || 0,
-      pages: Math.ceil((count || 0) / parseInt(limit)),
-    },
+    pagination: buildPagination(page, limit, count),
   });
 });
 
@@ -67,32 +69,9 @@ export const getSocioById = asyncHandler(async (req, res) => {
 
   if (error || !socio) return res.status(404).json({ error: 'Socio not found' });
 
-  const { data: inscripciones } = await supabase
-    .from('Inscripcion')
-    .select('*')
-    .eq('socioId', socio.id)
-    .eq('activo', true);
+  const [socioWithInscripciones] = await attachInscripciones(supabase, [socio]);
 
-  const list = inscripciones || [];
-  if (list.length > 0) {
-    const deporteIds = [...new Set(list.map((i) => i.deporteId))];
-    const { data: deportes } = await supabase
-      .from('Deporte')
-      .select('*')
-      .in('id', deporteIds);
-
-    const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
-    for (const i of list) {
-      i.deporte = deporteMap[i.deporteId] || null;
-    }
-  }
-
-  res.json({
-    data: {
-      ...socio,
-      inscripciones: list,
-    },
-  });
+  res.json({ data: socioWithInscripciones });
 });
 
 export const createSocio = asyncHandler(async (req, res) => {

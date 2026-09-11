@@ -11,7 +11,6 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Badge } from '../components/ui/badge'
-import { Card, CardContent } from '../components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -27,9 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table'
-import { TableSkeleton } from '../components/Skeleton'
-import Pagination from '../components/Pagination'
-import EmptyState from '../components/EmptyState'
+import DataTable from '../components/DataTable'
 import { useDebounce } from '../hooks/useDebounce'
 
 export default function Socios() {
@@ -145,77 +142,64 @@ export default function Socios() {
         />
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <TableSkeleton rows={6} cols={6} />
-          ) : socios.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="No se encontraron socios"
-              description={debouncedSearch ? 'No hay resultados para tu busqueda.' : 'Todavia no hay socios registrados.'}
-              action={!debouncedSearch ? { label: 'Crear Socio', onClick: () => { resetForm(); setModalOpen(true) } } : undefined}
-            />
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nombre</TableHead>
-                      <TableHead>DNI</TableHead>
-                      <TableHead className="hidden md:table-cell">Email</TableHead>
-                      <TableHead className="hidden sm:table-cell">Telefono</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {socios.map((socio) => (
-                      <TableRow key={socio.id}>
-                        <TableCell className="font-medium">
-                          {socio.nombre} {socio.apellido}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">{socio.dni}</TableCell>
-                        <TableCell className="hidden md:table-cell text-muted-foreground">{socio.email}</TableCell>
-                        <TableCell className="hidden sm:table-cell text-muted-foreground">{socio.telefono || '-'}</TableCell>
-                        <TableCell>
-                          <Badge variant={socio.activo ? 'default' : 'destructive'}>
-                            {socio.activo ? 'Activo' : 'Inactivo'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-0.5">
-                            <Button size="icon" variant="ghost" asChild className="h-8 w-8">
-                              <Link to={`/socios/${socio.id}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(socio)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDeleteDialog(socio)}>
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {pagination && (
-                <Pagination
-                  page={pagination.page}
-                  pages={pagination.pages}
-                  total={pagination.total}
-                  onPageChange={setPage}
-                />
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <DataTable
+        loading={isLoading}
+        skeleton={{ rows: 6, cols: 6 }}
+        isEmpty={socios.length === 0}
+        emptyState={{
+          icon: Users,
+          title: 'No se encontraron socios',
+          description: debouncedSearch ? 'No hay resultados para tu busqueda.' : 'Todavia no hay socios registrados.',
+          action: !debouncedSearch ? { label: 'Crear Socio', onClick: () => { resetForm(); setModalOpen(true) } } : undefined,
+        }}
+        pagination={pagination}
+        onPageChange={setPage}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>DNI</TableHead>
+              <TableHead className="hidden md:table-cell">Email</TableHead>
+              <TableHead className="hidden sm:table-cell">Telefono</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {socios.map((socio) => (
+              <TableRow key={socio.id}>
+                <TableCell className="font-medium">
+                  {socio.nombre} {socio.apellido}
+                </TableCell>
+                <TableCell className="text-muted-foreground">{socio.dni}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">{socio.email}</TableCell>
+                <TableCell className="hidden sm:table-cell text-muted-foreground">{socio.telefono || '-'}</TableCell>
+                <TableCell>
+                  <Badge variant={socio.activo ? 'default' : 'destructive'}>
+                    {socio.activo ? 'Activo' : 'Inactivo'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-0.5">
+                    <Button size="icon" variant="ghost" asChild className="h-8 w-8">
+                      <Link to={`/socios/${socio.id}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(socio)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setDeleteDialog(socio)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </DataTable>
 
       <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) resetForm() }}>
         <DialogContent className="sm:max-w-lg">

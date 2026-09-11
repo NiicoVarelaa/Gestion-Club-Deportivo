@@ -1,6 +1,7 @@
 import { getSupabase } from '../utils/supabase.js';
 import { createPagoSchema } from '../utils/validations.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { buildPagination } from '../utils/pagination.js';
 
 export const getPagos = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
@@ -45,12 +46,7 @@ export const getPagos = asyncHandler(async (req, res) => {
 
   res.json({
     data: list,
-    pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total: count || 0,
-      pages: Math.ceil((count || 0) / parseInt(limit)),
-    },
+    pagination: buildPagination(page, limit, count),
   });
 });
 
@@ -104,8 +100,18 @@ export const getDeudasBySocio = asyncHandler(async (req, res) => {
   }
 
   const deporteIds = [...new Set(inscripciones.map((i) => i.deporteId))];
-  const { data: deportes } = await supabase.from('Deporte').select('*').in('id', deporteIds);
+
+  const [{ data: deportes }, { data: pagos }] = await Promise.all([
+    supabase.from('Deporte').select('*').in('id', deporteIds),
+    supabase
+      .from('Pago')
+      .select('deporteId, mes, anio, estado')
+      .eq('socioId', socioId)
+      .in('deporteId', deporteIds),
+  ]);
+
   const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+  const pagosByKey = new Map((pagos || []).map((p) => [`${p.deporteId}|${p.mes}|${p.anio}`, p]));
 
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
@@ -118,22 +124,13 @@ export const getDeudasBySocio = asyncHandler(async (req, res) => {
     const deporte = deporteMap[inscripcion.deporteId];
     if (!deporte) continue;
 
-    const mesInscripcion = new Date(inscripcion.fechaInscripcion).getMonth() + 1;
-    const anioInscripcion = new Date(inscripcion.fechaInscripcion).getFullYear();
-
+    const fechaInscripcion = new Date(inscripcion.fechaInscripcion);
     const mesesPendientes = [];
-    let mes = mesInscripcion;
-    let anio = anioInscripcion;
+    let mes = fechaInscripcion.getMonth() + 1;
+    let anio = fechaInscripcion.getFullYear();
 
     while (anio < currentYear || (anio === currentYear && mes <= currentMonth)) {
-      const { data: pago } = await supabase
-        .from('Pago')
-        .select('*')
-        .eq('socioId', socioId)
-        .eq('deporteId', inscripcion.deporteId)
-        .eq('mes', mes)
-        .eq('anio', anio)
-        .single();
+      const pago = pagosByKey.get(`${inscripcion.deporteId}|${mes}|${anio}`);
 
       if (!pago || pago.estado !== 'PAGADO') {
         const isVencido = anio < currentYear || (anio === currentYear && mes < currentMonth);
@@ -190,49 +187,42 @@ export const generateMonthlyPayments = asyncHandler(async (req, res) => {
   }
 
   const deporteIds = [...new Set(inscripciones.map((i) => i.deporteId))];
-  const { data: deportes } = await supabase.from('Deporte').select('*').in('id', deporteIds);
+
+  const [{ data: deportes }, { data: pagosDelMes }] = await Promise.all([
+    supabase.from('Deporte').select('*').in('id', deporteIds),
+    supabase.from('Pago').select('socioId, deporteId').eq('mes', mes).eq('anio', anio),
+  ]);
+
   const deporteMap = Object.fromEntries((deportes || []).map((d) => [d.id, d]));
+  const yaGenerado = new Set((pagosDelMes || []).map((p) => `${p.socioId}|${p.deporteId}`));
 
-  let created = 0;
+  const nuevos = inscripciones
+    .filter((i) => {
+      const deporte = deporteMap[i.deporteId];
+      return deporte && !yaGenerado.has(`${i.socioId}|${i.deporteId}`);
+    })
+    .map((i) => ({
+      socioId: i.socioId,
+      deporteId: i.deporteId,
+      mes,
+      anio,
+      monto: deporteMap[i.deporteId].cuotaMensual,
+      estado: 'PENDIENTE',
+    }));
 
-  for (const inscripcion of inscripciones) {
-    const deporte = deporteMap[inscripcion.deporteId];
-    if (!deporte) continue;
-
-    const { data: existing } = await supabase
-      .from('Pago')
-      .select('*')
-      .eq('socioId', inscripcion.socioId)
-      .eq('deporteId', inscripcion.deporteId)
-      .eq('mes', mes)
-      .eq('anio', anio)
-      .single();
-
-    if (!existing) {
-      await supabase.from('Pago').insert([{
-        socioId: inscripcion.socioId,
-        deporteId: inscripcion.deporteId,
-        mes,
-        anio,
-        monto: deporte.cuotaMensual,
-        estado: 'PENDIENTE',
-      }]);
-      created++;
-    }
+  if (nuevos.length > 0) {
+    const { error } = await supabase.from('Pago').insert(nuevos);
+    if (error) throw error;
   }
 
-  const { data: pagosPendientes } = await supabase
-    .from('Pago')
-    .select('id, mes, anio')
-    .eq('estado', 'PENDIENTE');
+  const [{ error: errAniosPasados }, { error: errMesesPasados }] = await Promise.all([
+    supabase.from('Pago').update({ estado: 'VENCIDO' }).eq('estado', 'PENDIENTE').lt('anio', anio),
+    supabase.from('Pago').update({ estado: 'VENCIDO' }).eq('estado', 'PENDIENTE').eq('anio', anio).lt('mes', mes),
+  ]);
+  if (errAniosPasados) throw errAniosPasados;
+  if (errMesesPasados) throw errMesesPasados;
 
-  for (const pago of pagosPendientes || []) {
-    if (pago.anio < anio || (pago.anio === anio && pago.mes < mes)) {
-      await supabase.from('Pago').update({ estado: 'VENCIDO' }).eq('id', pago.id);
-    }
-  }
-
-  res.json({ message: `Generated ${created} pending payments for ${mes}/${anio}`, created });
+  res.json({ message: `Generated ${nuevos.length} pending payments for ${mes}/${anio}`, created: nuevos.length });
 });
 
 export const getDashboardStats = asyncHandler(async (req, res) => {

@@ -1,6 +1,7 @@
 import { getSupabase } from '../utils/supabase.js';
 import { createInscripcionSchema } from '../utils/validations.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { buildPagination } from '../utils/pagination.js';
 
 export const getInscripciones = asyncHandler(async (req, res) => {
   const supabase = getSupabase();
@@ -39,12 +40,7 @@ export const getInscripciones = asyncHandler(async (req, res) => {
 
   res.json({
     data: list,
-    pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      total: count || 0,
-      pages: Math.ceil((count || 0) / parseInt(limit)),
-    },
+    pagination: buildPagination(page, limit, count),
   });
 });
 

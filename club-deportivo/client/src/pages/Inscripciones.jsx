@@ -6,11 +6,10 @@ import { toast } from 'sonner'
 import { inscripcionesService, sociosService, deportesService } from '../services'
 import { inscripcionSchema } from '../schemas'
 import { Plus, Trash2, User, Trophy, FileText, FileDown } from 'lucide-react'
-import { formatDate } from '../lib/utils'
+import { formatDate, selectClassName } from '../lib/utils'
 import { Button } from '../components/ui/button'
 import { Label } from '../components/ui/label'
 import { Badge } from '../components/ui/badge'
-import { Card, CardContent } from '../components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -26,12 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table'
-import { TableSkeleton } from '../components/Skeleton'
-import Pagination from '../components/Pagination'
-import EmptyState from '../components/EmptyState'
+import DataTable from '../components/DataTable'
 import { exportToPDF, exportToExcel, inscripcionesExportColumns, formatInscripcionForExport } from '../lib/export'
-
-const selectStyles = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 
 export default function Inscripciones() {
   const queryClient = useQueryClient()
@@ -132,78 +127,65 @@ export default function Inscripciones() {
         </div>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <TableSkeleton rows={5} cols={5} />
-          ) : list.length === 0 ? (
-            <EmptyState
-              icon={FileText}
-              title="No hay inscripciones"
-              description="Todavia no se registraron inscripciones en el sistema."
-              action={{ label: 'Nueva Inscripcion', onClick: () => { reset(); setModalOpen(true) } }}
-            />
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Socio</TableHead>
-                      <TableHead>Deporte</TableHead>
-                      <TableHead className="hidden sm:table-cell">Fecha Inscripcion</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {list.map((insc) => (
-                      <TableRow key={insc.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <span className="font-medium truncate">{insc.socio?.nombre} {insc.socio?.apellido}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Trophy className="h-4 w-4 shrink-0 text-muted-foreground" />
-                            <span className="truncate">{insc.deporte?.nombre}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell text-muted-foreground">
-                          {formatDate(insc.fechaInscripcion)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="default">Activo</Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8"
-                            onClick={() => setCancelDialog(insc)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {pagination && (
-                <Pagination
-                  page={pagination.page}
-                  pages={pagination.pages}
-                  total={pagination.total}
-                  onPageChange={setPage}
-                />
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <DataTable
+        loading={isLoading}
+        skeleton={{ rows: 5, cols: 5 }}
+        isEmpty={list.length === 0}
+        emptyState={{
+          icon: FileText,
+          title: 'No hay inscripciones',
+          description: 'Todavia no se registraron inscripciones en el sistema.',
+          action: { label: 'Nueva Inscripcion', onClick: () => { reset(); setModalOpen(true) } },
+        }}
+        pagination={pagination}
+        onPageChange={setPage}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Socio</TableHead>
+              <TableHead>Deporte</TableHead>
+              <TableHead className="hidden sm:table-cell">Fecha Inscripcion</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {list.map((insc) => (
+              <TableRow key={insc.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="font-medium truncate">{insc.socio?.nombre} {insc.socio?.apellido}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate">{insc.deporte?.nombre}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell text-muted-foreground">
+                  {formatDate(insc.fechaInscripcion)}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="default">Activo</Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8"
+                    onClick={() => setCancelDialog(insc)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </DataTable>
 
       <Dialog open={modalOpen} onOpenChange={(open) => { setModalOpen(open); if (!open) reset() }}>
         <DialogContent>
@@ -213,7 +195,7 @@ export default function Inscripciones() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="socioId">Socio</Label>
-              <select id="socioId" {...register('socioId')} className={selectStyles} defaultValue="">
+              <select id="socioId" {...register('socioId')} className={selectClassName} defaultValue="">
                 <option value="" disabled>Seleccionar socio</option>
                 {sociosList.map((s) => (
                   <option key={s.id} value={s.id}>{s.nombre} {s.apellido} - DNI: {s.dni}</option>
@@ -223,7 +205,7 @@ export default function Inscripciones() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="deporteId">Deporte</Label>
-              <select id="deporteId" {...register('deporteId')} className={selectStyles} defaultValue="">
+              <select id="deporteId" {...register('deporteId')} className={selectClassName} defaultValue="">
                 <option value="" disabled>Seleccionar deporte</option>
                 {deportesList.map((d) => (
                   <option key={d.id} value={d.id}>{d.nombre} - {d.cuotaMensual}/mes</option>
