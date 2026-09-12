@@ -9,7 +9,10 @@
     "db:generate": "pnpm -F gesclub-server db:generate",
     "db:migrate": "pnpm -F gesclub-server db:migrate",
     "db:push": "pnpm -F gesclub-server db:push",
-    "db:studio": "pnpm -F gesclub-server db:studio"
+    "db:studio": "pnpm -F gesclub-server db:studio",
+    "test": "pnpm -r test",
+    "test:run": "pnpm -r test:run",
+    "test:coverage": "pnpm -r test:coverage"
   },
   "dependencies": {
     "react": "^18.3.1",
