@@ -57,16 +57,43 @@ describe('deportesService', () => {
     expect(apiMock.get).toHaveBeenCalledWith('/deportes', { params: undefined })
   })
 
+  it('getById calls api.get with the id', () => {
+    deportesService.getById('d1')
+    expect(apiMock.get).toHaveBeenCalledWith('/deportes/d1')
+  })
+
   it('create calls api.post with data', () => {
     const data = { nombre: 'Futbol' }
     deportesService.create(data)
     expect(apiMock.post).toHaveBeenCalledWith('/deportes', data)
+  })
+
+  it('update calls api.put with id and data', () => {
+    const data = { nombre: 'Tenis' }
+    deportesService.update('d1', data)
+    expect(apiMock.put).toHaveBeenCalledWith('/deportes/d1', data)
+  })
+
+  it('delete calls api.delete with the id', () => {
+    deportesService.delete('d1')
+    expect(apiMock.delete).toHaveBeenCalledWith('/deportes/d1')
   })
 })
 
 describe('inscripcionesService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('getAll calls api.get with params', () => {
+    inscripcionesService.getAll({ socioId: 's1' })
+    expect(apiMock.get).toHaveBeenCalledWith('/inscripciones', { params: { socioId: 's1' } })
+  })
+
+  it('create calls api.post with data', () => {
+    const data = { socioId: 's1', deporteId: 'd1' }
+    inscripcionesService.create(data)
+    expect(apiMock.post).toHaveBeenCalledWith('/inscripciones', data)
   })
 
   it('cancel deletes the inscripcion', () => {
@@ -78,6 +105,17 @@ describe('inscripcionesService', () => {
 describe('pagosService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('getAll calls api.get with params', () => {
+    pagosService.getAll({ socioId: 's1' })
+    expect(apiMock.get).toHaveBeenCalledWith('/pagos', { params: { socioId: 's1' } })
+  })
+
+  it('create calls api.post with data', () => {
+    const data = { socioId: 's1', deporteId: 'd1', mes: 6, anio: 2025, monto: '500' }
+    pagosService.create(data)
+    expect(apiMock.post).toHaveBeenCalledWith('/pagos', data)
   })
 
   it('getDeudas calls api.get with the socios id', () => {
