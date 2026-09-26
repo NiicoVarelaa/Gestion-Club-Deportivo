@@ -1,44 +1,30 @@
 import { useState, useEffect } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { useSocioStore } from '@/stores/socioStore'
-import { portalService } from '@/services'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatDate } from '@/lib/utils'
 import { User, Mail, Phone, Calendar, Pencil, Loader2, Badge as BadgeIcon } from 'lucide-react'
+import { usePortalData, useUpdatePortalProfile } from '@/hooks/usePortal'
 
 export default function PortalPerfil() {
-  const { socio, loading, fetchPortalData, updateSocio } = useSocioStore()
+  const { data, isLoading } = usePortalData()
+  const socio = data?.socio
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ nombre: '', apellido: '', telefono: '' })
 
   useEffect(() => {
-    fetchPortalData()
-  }, [fetchPortalData])
-
-  useEffect(() => {
-    if (socio) {
+    if (socio && !editing) {
       setForm({
         nombre: socio.nombre || '',
         apellido: socio.apellido || '',
         telefono: socio.telefono || '',
       })
     }
-  }, [socio])
+  }, [socio, editing])
 
-  const mutation = useMutation({
-    mutationFn: (data) => portalService.updateProfile(data),
-    onSuccess: (res) => {
-      updateSocio(res.data.data)
-      setEditing(false)
-      toast.success('Perfil actualizado correctamente')
-    },
-    onError: () => {
-      toast.error('Error al actualizar el perfil')
-    },
+  const mutation = useUpdatePortalProfile({
+    onSuccess: () => setEditing(false),
   })
 
   const handleSave = () => {
@@ -60,7 +46,7 @@ export default function PortalPerfil() {
     setEditing(false)
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />

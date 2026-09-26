@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { sociosService } from '../services'
-import { socioSchema } from '../schemas'
 import { Plus, Search, Edit, Trash2, Eye, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { socioSchema } from '../schemas'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -28,9 +25,9 @@ import {
 } from '../components/ui/table'
 import DataTable from '../components/DataTable'
 import { useDebounce } from '../hooks/useDebounce'
+import { useSocios, useCreateSocio, useUpdateSocio, useDeleteSocio } from '../hooks/useSocios'
 
 export default function Socios() {
-  const queryClient = useQueryClient()
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState(null)
   const [search, setSearch] = useState('')
@@ -40,42 +37,7 @@ export default function Socios() {
 
   const debouncedSearch = useDebounce(search, 300)
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['socios', debouncedSearch, page],
-    queryFn: () => sociosService.getAll({ search: debouncedSearch, page, limit }).then((res) => res.data),
-  })
-
-  const createMutation = useMutation({
-    mutationFn: sociosService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['socios'])
-      toast.success('Socio creado correctamente')
-      setModalOpen(false)
-      resetForm()
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al crear socio'),
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => sociosService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['socios'])
-      toast.success('Socio actualizado correctamente')
-      setModalOpen(false)
-      resetForm()
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al actualizar'),
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: sociosService.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['socios'])
-      toast.success('Socio dado de baja correctamente')
-      setDeleteDialog(null)
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al dar de baja'),
-  })
+  const { data, isLoading } = useSocios({ search: debouncedSearch, page, limit })
 
   const {
     register,
@@ -91,9 +53,18 @@ export default function Socios() {
     setEditingSocio(null)
   }
 
+  const closeForm = () => {
+    setModalOpen(false)
+    resetForm()
+  }
+
+  const createMutation = useCreateSocio({ onSuccess: closeForm })
+  const updateMutation = useUpdateSocio({ onSuccess: closeForm })
+  const deleteMutation = useDeleteSocio({ onSuccess: () => setDeleteDialog(null) })
+
   const onSubmit = (data) => {
     if (editingSocio) {
-      updateMutation.mutate({ id: editingSocio.id, data })
+      updateMutation.mutate({ id: editingSocio.id, ...data })
     } else {
       createMutation.mutate(data)
     }

@@ -16,7 +16,7 @@ vi.mock('axios', () => ({
   },
 }))
 
-import api from './api.js'
+import api, { getApiError } from './api.js'
 
 const requestHandler = interceptorsMock.request.use.mock.calls[0][0]
 const responseHandler = interceptorsMock.response.use.mock.calls[0][0]
@@ -70,5 +70,30 @@ describe('api interceptors', () => {
 
   it('creates the axios instance through the mocked create', () => {
     expect(api.defaults).toBeDefined()
+  })
+})
+
+describe('getApiError', () => {
+  it('reads the error key, which is the server contract', () => {
+    const err = { response: { data: { error: 'Socio not found' } } }
+    expect(getApiError(err, 'fallback')).toBe('Socio not found')
+  })
+
+  it('falls back to message when error is absent', () => {
+    const err = { response: { data: { message: 'Conflict' } } }
+    expect(getApiError(err, 'fallback')).toBe('Conflict')
+  })
+
+  it('prefers error over message', () => {
+    const err = { response: { data: { error: 'Admin access required', message: 'ignored' } } }
+    expect(getApiError(err, 'fallback')).toBe('Admin access required')
+  })
+
+  it('uses the fallback when the response body is missing', () => {
+    expect(getApiError(new Error('Network Error'), 'fallback')).toBe('fallback')
+  })
+
+  it('uses the fallback when the body carries no message', () => {
+    expect(getApiError({ response: { data: {} } }, 'fallback')).toBe('fallback')
   })
 })

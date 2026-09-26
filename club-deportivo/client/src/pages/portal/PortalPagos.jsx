@@ -1,21 +1,17 @@
-import { useEffect } from 'react'
-import { useSocioStore } from '@/stores/socioStore'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency, MESES } from '@/lib/utils'
 import { AlertTriangle, CreditCard, TrendingUp } from 'lucide-react'
+import { usePortalData } from '@/hooks/usePortal'
 
 export default function PortalPagos() {
-  const { pagos, deportes, deuda, loading, fetchPortalData } = useSocioStore()
-  const deporteMap = new Map((deportes || []).map((d) => [d.id, d.nombre]))
+  const { data, isLoading } = usePortalData()
+  const { pagos = [], deportes = [], deuda } = data || {}
+  const deporteMap = new Map(deportes.map((d) => [d.id, d.nombre]))
 
-  useEffect(() => {
-    fetchPortalData()
-  }, [fetchPortalData])
-
-  if (loading) {
+  if (isLoading) {
     return (
     <div className="space-y-6 animate-fade-in">
         <div className="h-8 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
@@ -24,11 +20,11 @@ export default function PortalPagos() {
     )
   }
 
-  const totalPagado = (pagos || [])
+  const totalPagado = pagos
     .filter((p) => p.estado === 'PAGADO')
     .reduce((sum, p) => sum + parseFloat(p.monto), 0)
 
-  const pagosDelAnio = (pagos || []).filter((p) => p.anio === new Date().getFullYear())
+  const pagosDelAnio = pagos.filter((p) => p.anio === new Date().getFullYear())
   const pagosPagados = pagosDelAnio.filter((p) => p.estado === 'PAGADO').length
   const totalDelAnio = pagosDelAnio.length
   const progresoPagos = totalDelAnio > 0 ? (pagosPagados / totalDelAnio) * 100 : 0

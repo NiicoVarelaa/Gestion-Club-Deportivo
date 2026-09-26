@@ -1,7 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { deportesService } from '@/services'
 import { formatCurrency } from '@/lib/utils'
+import { useDeportes } from '@/hooks/useDeportes'
 import { Trophy, Waves, Dumbbell, ArrowRight, Users, Clock, Star } from 'lucide-react'
 
 const featuredSports = [
@@ -157,10 +156,7 @@ function FeaturedCard({ sport, deporte, index }) {
 }
 
 export default function SportsGrid() {
-  const { data: deportes, isLoading } = useQuery({
-    queryKey: ['deportes', 'public'],
-    queryFn: () => deportesService.getAll({ activo: true }).then((res) => res.data.data || []),
-  })
+  const { data: deportes, isLoading } = useDeportes({ activo: 'true' })
 
   const getDeporte = (key) => {
     if (!deportes || deportes.length === 0) return null

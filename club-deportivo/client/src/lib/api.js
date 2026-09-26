@@ -26,4 +26,9 @@ api.interceptors.response.use(
   }
 )
 
+export const getApiError = (err, fallback) => {
+  const body = err?.response?.data
+  return body?.error || body?.message || fallback
+}
+
 export default api

@@ -1,9 +1,6 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-import { deportesService } from '../services'
 import { deporteSchema } from '../schemas'
 import { Plus, Edit, Trash2, Users, Trophy } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
@@ -21,48 +18,14 @@ import {
 } from '../components/ui/dialog'
 import { CardSkeleton } from '../components/Skeleton'
 import EmptyState from '../components/EmptyState'
+import { useDeportes, useCreateDeporte, useUpdateDeporte, useDeleteDeporte } from '../hooks/useDeportes'
 
 export default function Deportes() {
-  const queryClient = useQueryClient()
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState(null)
   const [editingDeporte, setEditingDeporte] = useState(null)
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['deportes'],
-    queryFn: () => deportesService.getAll().then((res) => res.data),
-  })
-
-  const createMutation = useMutation({
-    mutationFn: deportesService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['deportes'])
-      toast.success('Deporte creado correctamente')
-      setModalOpen(false)
-      resetForm()
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al crear'),
-  })
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => deportesService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['deportes'])
-      toast.success('Deporte actualizado correctamente')
-      setModalOpen(false)
-      resetForm()
-    },
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: deportesService.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['deportes'])
-      toast.success('Deporte dado de baja correctamente')
-      setDeleteDialog(null)
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al dar de baja'),
-  })
+  const { data: deportes = [], isLoading } = useDeportes()
 
   const {
     register,
@@ -78,9 +41,18 @@ export default function Deportes() {
     setEditingDeporte(null)
   }
 
+  const closeForm = () => {
+    setModalOpen(false)
+    resetForm()
+  }
+
+  const createMutation = useCreateDeporte({ onSuccess: closeForm })
+  const updateMutation = useUpdateDeporte({ onSuccess: closeForm })
+  const deleteMutation = useDeleteDeporte({ onSuccess: () => setDeleteDialog(null) })
+
   const onSubmit = (data) => {
     if (editingDeporte) {
-      updateMutation.mutate({ id: editingDeporte.id, data })
+      updateMutation.mutate({ id: editingDeporte.id, ...data })
     } else {
       createMutation.mutate(data)
     }
@@ -95,8 +67,6 @@ export default function Deportes() {
     })
     setModalOpen(true)
   }
-
-  const deportes = data?.data || []
 
   return (
     <div className="space-y-4 sm:space-y-6">

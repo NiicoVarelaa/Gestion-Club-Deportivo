@@ -1,6 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { pagosService } from '../services'
 import { Users, Trophy, CreditCard, AlertTriangle, TrendingUp, FileText, LayoutDashboardIcon } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
@@ -11,6 +9,7 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
+import { useDashboard } from '../hooks/usePagos'
 
 const statsCards = [
   { key: 'sociosActivos', label: 'Socios Activos', icon: Users, color: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400' },
@@ -22,10 +21,7 @@ const statsCards = [
 const PIE_COLORS = ['#16a34a', '#d97706', '#dc2626']
 
 export default function Dashboard() {
-  const { data: dashboardResponse, isLoading, isError } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => pagosService.getDashboard().then((res) => res.data),
-  })
+  const { data: dashboardResponse, isLoading, isError } = useDashboard()
 
   const data = dashboardResponse?.data
 

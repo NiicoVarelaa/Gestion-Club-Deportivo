@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet } from 'react-router-dom'
-import { useSocioStore } from '@/stores/socioStore'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useTheme } from '@/components/ThemeProvider'
+import { usePortalData } from '@/hooks/usePortal'
 import { Menu, LogOut, LayoutDashboard, Dumbbell, CreditCard, User, Sun, Moon } from 'lucide-react'
 
 const navItems = [
@@ -50,13 +51,17 @@ function NavLinks({ location, deuda }) {
 
 export default function PortalLayout() {
   const location = useLocation()
-  const { socio, deuda } = useSocioStore()
-  const { logout: authLogout } = useAuthStore()
+  const queryClient = useQueryClient()
+  const logout = useAuthStore((state) => state.logout)
   const { theme, toggleTheme } = useTheme()
+  const { data } = usePortalData()
+
+  const socio = data?.socio
+  const deuda = data?.deuda
 
   const handleLogout = async () => {
-    useSocioStore.getState().logout()
-    await authLogout()
+    queryClient.clear()
+    await logout()
     window.location.href = '/portal'
   }
 

@@ -1,18 +1,14 @@
-import { useEffect } from 'react'
-import { useSocioStore } from '@/stores/socioStore'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Dumbbell, Calendar } from 'lucide-react'
+import { usePortalData } from '@/hooks/usePortal'
 
 export default function PortalDeportes() {
-  const { deportes, loading, fetchPortalData } = useSocioStore()
+  const { data, isLoading } = usePortalData()
+  const deportes = data?.deportes || []
 
-  useEffect(() => {
-    fetchPortalData()
-  }, [fetchPortalData])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />

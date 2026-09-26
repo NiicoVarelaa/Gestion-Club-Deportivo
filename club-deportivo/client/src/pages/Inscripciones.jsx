@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { inscripcionesService, sociosService, deportesService } from '../services'
 import { inscripcionSchema } from '../schemas'
 import { Plus, Trash2, User, Trophy, FileText, FileDown } from 'lucide-react'
 import { formatDate, selectClassName } from '../lib/utils'
@@ -27,49 +25,20 @@ import {
 } from '../components/ui/table'
 import DataTable from '../components/DataTable'
 import { exportToPDF, exportToExcel, inscripcionesExportColumns, formatInscripcionForExport } from '../lib/export'
+import { useInscripciones, useCreateInscripcion, useCancelInscripcion } from '../hooks/useInscripciones'
+import { useSocioOptions } from '../hooks/useSocios'
+import { useDeportes } from '../hooks/useDeportes'
 
 export default function Inscripciones() {
-  const queryClient = useQueryClient()
   const [modalOpen, setModalOpen] = useState(false)
   const [cancelDialog, setCancelDialog] = useState(null)
   const [page, setPage] = useState(1)
   const limit = 10
 
-  const { data: inscripciones, isLoading } = useQuery({
-    queryKey: ['inscripciones', page],
-    queryFn: () => inscripcionesService.getAll({ page, limit }).then((res) => res.data),
-  })
+  const { data: inscripciones, isLoading } = useInscripciones({ page, limit })
 
-  const { data: socios } = useQuery({
-    queryKey: ['socios-select'],
-    queryFn: () => sociosService.getAll({ activo: 'true', limit: 200 }).then((res) => res.data),
-  })
-
-  const { data: deportes } = useQuery({
-    queryKey: ['deportes-select'],
-    queryFn: () => deportesService.getAll({ activo: 'true' }).then((res) => res.data),
-  })
-
-  const createMutation = useMutation({
-    mutationFn: inscripcionesService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['inscripciones'])
-      toast.success('Inscripcion realizada correctamente')
-      setModalOpen(false)
-      reset()
-    },
-    onError: (err) => toast.error(err.response?.data?.error || 'Error al inscribir'),
-  })
-
-  const cancelMutation = useMutation({
-    mutationFn: inscripcionesService.cancel,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['inscripciones'])
-      toast.success('Inscripcion cancelada correctamente')
-      setCancelDialog(null)
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al cancelar'),
-  })
+  const { data: sociosList = [] } = useSocioOptions()
+  const { data: deportesList = [] } = useDeportes({ activo: 'true' })
 
   const {
     register,
@@ -80,13 +49,22 @@ export default function Inscripciones() {
     resolver: zodResolver(inscripcionSchema),
   })
 
+  const createMutation = useCreateInscripcion({
+    onSuccess: () => {
+      setModalOpen(false)
+      reset()
+    },
+  })
+
+  const cancelMutation = useCancelInscripcion({
+    onSuccess: () => setCancelDialog(null),
+  })
+
   const onSubmit = (data) => {
     createMutation.mutate(data)
   }
 
   const list = inscripciones?.data || []
-  const sociosList = socios?.data || []
-  const deportesList = deportes?.data || []
   const pagination = inscripciones?.pagination
   const total = pagination?.total ?? list.length
 

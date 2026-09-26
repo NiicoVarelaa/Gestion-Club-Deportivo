@@ -18,8 +18,7 @@ import {
 import { cn } from '../lib/utils'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { useQuery } from '@tanstack/react-query'
-import { pagosService } from '../services'
+import { useDashboard } from '../hooks/usePagos'
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,11 +35,7 @@ export default function Layout() {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useUIStore()
   const { theme, toggleTheme } = useTheme()
 
-  const { data: dashData } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => pagosService.getDashboard().then((res) => res.data),
-    staleTime: 1000 * 60,
-  })
+  const { data: dashData } = useDashboard()
 
   const handleLogout = async () => {
     await logout()

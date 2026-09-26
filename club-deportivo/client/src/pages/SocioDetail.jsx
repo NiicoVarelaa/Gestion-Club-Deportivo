@@ -1,6 +1,4 @@
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { sociosService, pagosService } from '../services'
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard, User, Users } from 'lucide-react'
 import { formatCurrency, formatDate, MESES } from '../lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
@@ -8,20 +6,14 @@ import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { DetailSkeleton } from '../components/Skeleton'
 import EmptyState from '../components/EmptyState'
+import { useSocio } from '../hooks/useSocios'
+import { useDeudas } from '../hooks/usePagos'
 
 export default function SocioDetail() {
   const { id } = useParams()
 
-  const { data: socioResponse, isLoading, isError } = useQuery({
-    queryKey: ['socio', id],
-    queryFn: () => sociosService.getById(id).then((res) => res.data),
-  })
-
-  const { data: deudasResponse } = useQuery({
-    queryKey: ['deudas', id],
-    queryFn: () => pagosService.getDeudas(id).then((res) => res.data),
-    enabled: !!id,
-  })
+  const { data: socioResponse, isLoading, isError } = useSocio(id)
+  const { data: deudasResponse } = useDeudas(id)
 
   const socioData = socioResponse?.data
   const deudasData = deudasResponse?.data

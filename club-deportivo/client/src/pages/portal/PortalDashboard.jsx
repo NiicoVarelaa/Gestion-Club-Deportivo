@@ -1,20 +1,16 @@
-import { useEffect } from 'react'
-import { useSocioStore } from '@/stores/socioStore'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { formatCurrency, formatDate, MESES } from '@/lib/utils'
 import { AlertTriangle, Dumbbell, CalendarCheck, TrendingUp } from 'lucide-react'
+import { usePortalData } from '@/hooks/usePortal'
 
 export default function PortalDashboard() {
-  const { socio, deportes, pagos, deuda, loading, fetchPortalData } = useSocioStore()
-  const deporteMap = new Map((deportes || []).map((d) => [d.id, d.nombre]))
+  const { data, isLoading } = usePortalData()
+  const { socio, deportes = [], pagos = [], deuda } = data || {}
+  const deporteMap = new Map(deportes.map((d) => [d.id, d.nombre]))
 
-  useEffect(() => {
-    fetchPortalData()
-  }, [fetchPortalData])
-
-  if (loading) {
+  if (isLoading) {
     return (
     <div className="space-y-8 animate-fade-in">
         <div className="h-8 w-48 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
@@ -31,11 +27,11 @@ export default function PortalDashboard() {
   const mesActual = now.getMonth() + 1
   const anioActual = now.getFullYear()
 
-  const pagosDelMes = pagos?.filter(
+  const pagosDelMes = pagos.filter(
     (p) => p.mes === mesActual && p.anio === anioActual && p.estado === 'PAGADO'
-  ) || []
+  )
 
-  const totalAbonado = (pagos || [])
+  const totalAbonado = pagos
     .filter((p) => p.estado === 'PAGADO')
     .reduce((sum, p) => sum + parseFloat(p.monto), 0)
 

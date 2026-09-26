@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { pagosService, sociosService, deportesService } from '../services'
 import { pagoSchema } from '../schemas'
 import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard, FileDown } from 'lucide-react'
 import { formatCurrency, formatDate, MESES, selectClassName } from '../lib/utils'
@@ -29,6 +27,9 @@ import {
 import DataTable from '../components/DataTable'
 import SocioSelect from '../components/SocioSelect'
 import { exportToPDF, exportToExcel, pagosExportColumns, formatPagoForExport } from '../lib/export'
+import { usePagos, useDeudas, useCreatePago, useGenerateCuotas } from '../hooks/usePagos'
+import { useSocioOptions } from '../hooks/useSocios'
+import { useDeportes } from '../hooks/useDeportes'
 
 const estadoIcon = {
   PAGADO: CheckCircle,
@@ -50,7 +51,6 @@ const FILTROS = [
 ]
 
 export default function Pagos() {
-  const queryClient = useQueryClient()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSocio, setSelectedSocio] = useState(null)
   const [filterEstado, setFilterEstado] = useState('')
@@ -62,47 +62,11 @@ export default function Pagos() {
   const currentMes = now.getMonth() + 1
   const currentAnio = now.getFullYear()
 
-  const { data: pagosData, isLoading } = useQuery({
-    queryKey: ['pagos', filterEstado, page],
-    queryFn: () => pagosService.getAll({ estado: filterEstado || undefined, page, limit }).then((res) => res.data),
-  })
+  const { data: pagosData, isLoading } = usePagos({ estado: filterEstado, page, limit })
 
-  const { data: socios } = useQuery({
-    queryKey: ['socios-select'],
-    queryFn: () => sociosService.getAll({ activo: 'true', limit: 200 }).then((res) => res.data),
-  })
-
-  const { data: deportes } = useQuery({
-    queryKey: ['deportes-select'],
-    queryFn: () => deportesService.getAll({ activo: 'true' }).then((res) => res.data),
-  })
-
-  const { data: deudas, refetch: refetchDeudas } = useQuery({
-    queryKey: ['deudas', selectedSocio],
-    queryFn: () => pagosService.getDeudas(selectedSocio).then((res) => res.data),
-    enabled: !!selectedSocio,
-  })
-
-  const createMutation = useMutation({
-    mutationFn: pagosService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['pagos'])
-      queryClient.invalidateQueries(['deudas'])
-      toast.success('Pago registrado correctamente')
-      setModalOpen(false)
-      reset()
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al registrar pago'),
-  })
-
-  const generateMutation = useMutation({
-    mutationFn: pagosService.generateMonthly,
-    onSuccess: (res) => {
-      queryClient.invalidateQueries(['pagos'])
-      toast.success(res.data.message || 'Cuotas generadas correctamente')
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error al generar cuotas'),
-  })
+  const { data: sociosList = [] } = useSocioOptions()
+  const { data: deportesList = [] } = useDeportes({ activo: 'true' })
+  const { data: deudas } = useDeudas(selectedSocio)
 
   const {
     register,
@@ -118,6 +82,15 @@ export default function Pagos() {
     },
   })
 
+  const createMutation = useCreatePago({
+    onSuccess: () => {
+      setModalOpen(false)
+      resetDialog()
+    },
+  })
+
+  const generateMutation = useGenerateCuotas()
+
   const onSubmit = (data) => {
     createMutation.mutate(data)
   }
@@ -125,7 +98,6 @@ export default function Pagos() {
   const selectSocio = (socio) => {
     setSelectedSocio(socio.id)
     setValue('socioId', socio.id)
-    if (socio.id) refetchDeudas()
   }
 
   const clearSocio = () => {
@@ -134,8 +106,6 @@ export default function Pagos() {
   }
 
   const pagos = pagosData?.data || []
-  const sociosList = socios?.data || []
-  const deportesList = deportes?.data || []
   const pagination = pagosData?.pagination
 
   const resetDialog = () => {
