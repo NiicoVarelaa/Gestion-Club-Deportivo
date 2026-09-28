@@ -18,14 +18,21 @@ function chainable(result) {
   return proxy
 }
 
-function makeSupabaseMock(tableHandlers, authGetUser) {
+function makeSupabaseMock(tableHandlers, authGetUser, authMethods = {}) {
+  const auth = authGetUser || Object.keys(authMethods).length
+    ? { ...(authGetUser ? { getUser: authGetUser } : {}), ...authMethods }
+    : undefined
   return {
     from: (table) => chainable(tableHandlers[table]()),
-    auth: authGetUser
-      ? { getUser: authGetUser }
-      : undefined,
+    auth,
   }
 }
+
+const adminUser = () =>
+  vi.fn().mockResolvedValue({
+    data: { user: { user_metadata: { role: 'admin' } } },
+    error: null,
+  })
 
 describe('API integration', () => {
   beforeEach(() => {
@@ -152,5 +159,103 @@ describe('API integration', () => {
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('Validation error')
     expect(Array.isArray(res.body.details)).toBe(true)
+  })
+})
+
+describe('API error contract', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('responds 409 and hides the index name when a unique constraint is violated', async () => {
+    vi.mocked(getSupabase).mockReturnValue(
+      makeSupabaseMock(
+        {
+          Deporte: () => ({
+            data: null,
+            error: {
+              message: 'duplicate key value violates unique constraint "Deporte_nombre_key"',
+              code: '23505',
+            },
+          }),
+        },
+        adminUser()
+      )
+    )
+
+    const res = await request(app)
+      .post('/api/deportes')
+      .set('Authorization', 'Bearer token')
+      .send({ nombre: 'Futbol', cuotaMensual: 1000 })
+
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('A record with this value already exists')
+    expect(JSON.stringify(res.body)).not.toContain('Deporte_nombre_key')
+  })
+
+  it('responds 401 for invalid login credentials instead of a server error', async () => {
+    vi.mocked(getSupabase).mockReturnValue(
+      makeSupabaseMock({}, undefined, {
+        signInWithPassword: vi.fn().mockResolvedValue({
+          data: { user: null, session: null },
+          error: { name: 'AuthApiError', status: 400, code: 'invalid_credentials', message: 'Invalid login credentials' },
+        }),
+      })
+    )
+
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'a@b.com', password: 'wrongpassword' })
+
+    expect(res.status).toBe(401)
+    expect(res.body.error).toBe('Invalid email or password')
+  })
+
+  it('responds 409 when a public signup reuses an existing email', async () => {
+    vi.mocked(getSupabase).mockReturnValue(
+      makeSupabaseMock({}, undefined, {
+        signUp: vi.fn().mockResolvedValue({
+          data: { user: { id: 'u1' }, session: {} },
+          error: { name: 'AuthApiError', status: 422, code: 'email_exists', message: 'User already registered' },
+        }),
+      })
+    )
+
+    const res = await request(app)
+      .post('/api/auth/signup-public')
+      .send({ nombre: 'Juan', apellido: 'Perez', dni: '12345678', email: 'a@b.com', password: 'Password1' })
+
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('Email already registered')
+  })
+
+  it('responds 500 with a generic body for an unrecognised database failure', async () => {
+    vi.mocked(getSupabase).mockReturnValue(
+      makeSupabaseMock(
+        {
+          Deporte: () => ({
+            data: null,
+            error: { message: 'connect ECONNREFUSED 10.0.0.4:5432' },
+          }),
+        },
+        adminUser()
+      )
+    )
+
+    const res = await request(app)
+      .post('/api/deportes')
+      .set('Authorization', 'Bearer token')
+      .send({ nombre: 'Futbol', cuotaMensual: 1000 })
+
+    expect(res.status).toBe(500)
+    expect(res.body.error).toBe('Internal server error')
+    expect(JSON.stringify(res.body)).not.toContain('10.0.0.4')
+  })
+
+  it('responds 404 as JSON for an unknown endpoint', async () => {
+    const res = await request(app).get('/api/no-existe')
+
+    expect(res.status).toBe(404)
+    expect(res.body.error).toBe('Endpoint not found')
   })
 })

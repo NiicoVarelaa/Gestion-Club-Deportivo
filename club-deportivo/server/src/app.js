@@ -69,6 +69,10 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
 app.use(errorHandler);
 
 export default app;
