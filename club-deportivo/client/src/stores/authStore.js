@@ -1,43 +1,62 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 
+const TOKEN_KEY = 'supabase_token'
+
+function persistToken(session) {
+  try {
+    const token = session?.access_token
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token)
+    } else {
+      localStorage.removeItem(TOKEN_KEY)
+    }
+  } catch {
+    // localStorage throws in private mode and when the quota is full
+  }
+}
+
+let latestInitId = 0
+
 export const useAuthStore = create((set) => ({
   user: null,
   session: null,
   loading: true,
 
-  init: async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    set({ session, user: session?.user ?? null, loading: false })
+  init: () => {
+    const id = ++latestInitId
+    let disposed = false
+    const isCurrent = () => !disposed && id === latestInitId
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      set({ session, user: session?.user ?? null })
-      if (session) {
-        localStorage.setItem('supabase_token', session.access_token)
-      } else {
-        localStorage.removeItem('supabase_token')
-      }
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isCurrent()) return
+      set({ session, user: session?.user ?? null, loading: false })
+      persistToken(session)
     })
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!isCurrent()) return
+      set({ session: data.session, user: data.session?.user ?? null, loading: false })
+      persistToken(data.session)
+    })
+
+    return () => {
+      disposed = true
+      sub?.subscription?.unsubscribe()
+    }
+  },
+
+  applySession: (session) => {
+    set({ session, user: session?.user ?? null, loading: false })
+    persistToken(session)
   },
 
   login: async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
-    localStorage.setItem('supabase_token', data.session.access_token)
-    set({ session: data.session, user: data.user })
-    return data
-  },
-
-  register: async (email, password, metadata) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: metadata },
-    })
-    if (error) throw error
+    const { session, user } = data
+    set({ session, user, loading: false })
+    persistToken(session)
     return data
   },
 
@@ -54,8 +73,13 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: async () => {
-    await supabase.auth.signOut()
-    localStorage.removeItem('supabase_token')
-    set({ session: null, user: null })
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // Local state is cleared regardless: the token is gone either way, so
+      // any request left in flight gets a 401 and the interceptor redirects.
+    }
+    set({ session: null, user: null, loading: false })
+    persistToken(null)
   },
 }))

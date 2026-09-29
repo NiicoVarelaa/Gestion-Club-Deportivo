@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { registroSchema } from '@/schemas'
 import { publicService } from '@/services'
+import { getApiError } from '@/lib/api'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
@@ -57,6 +58,7 @@ const inputIcons = {
 
 export default function Registro() {
   const navigate = useNavigate()
+  const applySession = useAuthStore((state) => state.applySession)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [submitError, setSubmitError] = useState(null)
@@ -86,14 +88,10 @@ export default function Registro() {
     setSubmitError(null)
     try {
       const res = await publicService.register(data)
-      const { session } = res.data
-      if (session) {
-        localStorage.setItem('supabase_token', session.access_token)
-        useAuthStore.setState({ session, user: session.user })
-      }
+      if (res.data.session) applySession(res.data.session)
       navigate('/portal')
     } catch (err) {
-      setSubmitError(err.response?.data?.error || 'Error al registrarse. Intentá de nuevo.')
+      setSubmitError(getApiError(err, 'Error al registrarse. Intentá de nuevo.'))
       setShakeKey((k) => k + 1)
     } finally {
       setIsSubmitting(false)

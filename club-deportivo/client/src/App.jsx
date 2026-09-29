@@ -32,7 +32,8 @@ function PageLoader() {
 }
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuthStore()
+  const user = useAuthStore((state) => state.user)
+  const loading = useAuthStore((state) => state.loading)
   if (loading) return <PageLoader />
   if (!user) return <Navigate to="/login" />
   if (user.user_metadata?.role !== 'admin') return <Navigate to="/portal" />
@@ -40,7 +41,8 @@ function ProtectedRoute({ children }) {
 }
 
 function SocioProtectedRoute() {
-  const { user, loading } = useAuthStore()
+  const user = useAuthStore((state) => state.user)
+  const loading = useAuthStore((state) => state.loading)
   if (loading) return <PageLoader />
   if (!user) return <Navigate to="/login" />
   return <Outlet />
@@ -49,9 +51,7 @@ function SocioProtectedRoute() {
 export default function App() {
   const init = useAuthStore((state) => state.init)
 
-  useEffect(() => {
-    init()
-  }, [init])
+  useEffect(() => init(), [init])
 
   return (
     <Routes>
