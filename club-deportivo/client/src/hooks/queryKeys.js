@@ -22,6 +22,7 @@ export const queryKeys = {
     all: () => ['pagos'],
     list: (params) => ['pagos', 'list', params ?? {}],
     deudas: (socioId) => ['pagos', 'deudas', String(socioId)],
+    vencidosCount: () => ['pagos', 'vencidos-count'],
   },
 
   portal: {

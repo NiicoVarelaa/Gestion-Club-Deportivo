@@ -1,4 +1,4 @@
-import Modal from './Modal'
+import Modal from '@/components/Modal'
 
 export default function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }) {
   return (

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { cleanParams } from './cleanParams'
-import { queryKeys } from './queryKeys'
+import { cleanParams } from '@/hooks/cleanParams'
+import { queryKeys } from '@/hooks/queryKeys'
 
 describe('cleanParams', () => {
   it('drops undefined, null and empty string values', () => {

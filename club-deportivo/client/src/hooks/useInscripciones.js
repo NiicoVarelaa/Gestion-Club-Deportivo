@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { inscripcionesService } from '../services'
-import { getApiError } from '../lib/api'
-import { queryKeys } from './queryKeys'
-import { cleanParams } from './cleanParams'
+import { inscripcionesService } from '@/services'
+import { getApiError } from '@/lib/api'
+import { queryKeys } from '@/hooks/queryKeys'
+import { cleanParams } from '@/hooks/cleanParams'
 
 export function useInscripciones({ page, limit } = {}) {
   const params = cleanParams({ page, limit })

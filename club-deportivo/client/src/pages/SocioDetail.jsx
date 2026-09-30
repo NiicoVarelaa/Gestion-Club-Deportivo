@@ -1,13 +1,13 @@
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard, User, Users } from 'lucide-react'
-import { formatCurrency, formatDate, MESES } from '../lib/utils'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { DetailSkeleton } from '../components/Skeleton'
-import EmptyState from '../components/EmptyState'
-import { useSocio } from '../hooks/useSocios'
-import { useDeudas } from '../hooks/usePagos'
+import { formatCurrency, formatDate, MESES } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { DetailSkeleton } from '@/components/Skeleton'
+import EmptyState from '@/components/EmptyState'
+import { useSocio } from '@/hooks/useSocios'
+import { useDeudas } from '@/hooks/usePagos'
 
 export default function SocioDetail() {
   const { id } = useParams()

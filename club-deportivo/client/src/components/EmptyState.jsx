@@ -1,6 +1,6 @@
 import { PackageOpen } from 'lucide-react'
-import { Button } from './ui/button'
-import { cn } from '../lib/utils'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function EmptyState({
   icon: Icon = PackageOpen,

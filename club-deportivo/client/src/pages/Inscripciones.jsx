@@ -2,19 +2,19 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { inscripcionSchema } from '../schemas'
+import { inscripcionSchema } from '@/schemas'
 import { Plus, Trash2, User, Trophy, FileText, FileDown } from 'lucide-react'
-import { formatDate, selectClassName } from '../lib/utils'
-import { Button } from '../components/ui/button'
-import { Label } from '../components/ui/label'
-import { Badge } from '../components/ui/badge'
+import { formatDate, selectClassName } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -22,12 +22,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../components/ui/table'
-import DataTable from '../components/DataTable'
-import { exportToPDF, exportToExcel, inscripcionesExportColumns, formatInscripcionForExport } from '../lib/export'
-import { useInscripciones, useCreateInscripcion, useCancelInscripcion } from '../hooks/useInscripciones'
-import { useSocioOptions } from '../hooks/useSocios'
-import { useDeportes } from '../hooks/useDeportes'
+} from '@/components/ui/table'
+import DataTable from '@/components/DataTable'
+import { exportToPDF, exportToExcel, inscripcionesExportColumns, formatInscripcionForExport } from '@/lib/export'
+import { useInscripciones, useCreateInscripcion, useCancelInscripcion } from '@/hooks/useInscripciones'
+import { useSocioOptions } from '@/hooks/useSocios'
+import { useDeportes } from '@/hooks/useDeportes'
 
 export default function Inscripciones() {
   const [modalOpen, setModalOpen] = useState(false)

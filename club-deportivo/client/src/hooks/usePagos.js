@@ -1,15 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { pagosService } from '../services'
-import { getApiError } from '../lib/api'
-import { queryKeys } from './queryKeys'
-import { cleanParams } from './cleanParams'
+import { pagosService } from '@/services'
+import { getApiError } from '@/lib/api'
+import { queryKeys } from '@/hooks/queryKeys'
+import { cleanParams } from '@/hooks/cleanParams'
+
+const VENCIDOS_COUNT_PARAMS = { estado: 'VENCIDO', limit: 1 }
 
 export function useDashboard() {
   return useQuery({
     queryKey: queryKeys.dashboard(),
     queryFn: () => pagosService.getDashboard().then((res) => res.data),
     staleTime: 1000 * 60,
+  })
+}
+
+// The sidebar badge only needs a count, so it asks for a single row and reads
+// the total from the pagination instead of pulling the whole dashboard on every
+// admin page. The key stays under pagos.all() so registering a payment
+// refreshes the badge through the existing invalidation.
+export function usePagosVencidosCount() {
+  return useQuery({
+    queryKey: queryKeys.pagos.vencidosCount(),
+    queryFn: () =>
+      pagosService.getAll(VENCIDOS_COUNT_PARAMS).then((res) => res.data.pagination.total),
   })
 }
 

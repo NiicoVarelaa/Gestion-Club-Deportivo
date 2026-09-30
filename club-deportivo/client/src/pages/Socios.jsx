@@ -3,18 +3,18 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Search, Edit, Trash2, Eye, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { socioSchema } from '../schemas'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
-import { Badge } from '../components/ui/badge'
+import { socioSchema } from '@/schemas'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -22,10 +22,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../components/ui/table'
-import DataTable from '../components/DataTable'
-import { useDebounce } from '../hooks/useDebounce'
-import { useSocios, useCreateSocio, useUpdateSocio, useDeleteSocio } from '../hooks/useSocios'
+} from '@/components/ui/table'
+import DataTable from '@/components/DataTable'
+import { useDebounce } from '@/hooks/useDebounce'
+import { useSocios, useCreateSocio, useUpdateSocio, useDeleteSocio } from '@/hooks/useSocios'
 
 export default function Socios() {
   const [modalOpen, setModalOpen] = useState(false)

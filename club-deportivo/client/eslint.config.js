@@ -58,6 +58,20 @@ export default [
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Imports are always the @/ alias or a bare package specifier. The alias
+      // is what stops admin and portal code from drifting into two styles.
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['./*', '../*'],
+              message:
+                'Usa el alias @/ (vite.config.js) en vez de rutas relativas.',
+            },
+          ],
+        },
+      ],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

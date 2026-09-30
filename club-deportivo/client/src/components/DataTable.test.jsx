@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import DataTable from './DataTable.jsx'
+import DataTable from '@/components/DataTable'
 
 describe('DataTable', () => {
   it('shows a table skeleton while loading', () => {

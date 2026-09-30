@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { cn, formatCurrency, formatDate, MESES } from './utils.js'
+import { cn, formatCurrency, formatDate, MESES } from '@/lib/utils'
 
 describe('cn', () => {
   it('merges class names into a string', () => {

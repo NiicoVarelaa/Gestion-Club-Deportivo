@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 function filterSocios(socios, searchTerm) {
   return socios.filter((s) =>

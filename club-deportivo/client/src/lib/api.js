@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -8,7 +9,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('supabase_token')
+  const token = useAuthStore.getState().session?.access_token
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -19,7 +20,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('supabase_token')
+      // Drop the session in the store too, not just the header source, or the
+      // app keeps rendering as if signed in until the next full reload.
+      // Best effort: the rejection below is what the caller actually handles.
+      void useAuthStore.getState().expireSession()
       window.location.href = '/login'
     }
     return Promise.reject(error)

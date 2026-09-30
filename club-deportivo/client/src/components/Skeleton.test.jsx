@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { TableSkeleton, CardSkeleton, StatsSkeleton } from './Skeleton.jsx'
+import { TableSkeleton, CardSkeleton, StatsSkeleton } from '@/components/Skeleton'
 
 describe('TableSkeleton', () => {
   it('renders rows x cols skeleton blocks', () => {

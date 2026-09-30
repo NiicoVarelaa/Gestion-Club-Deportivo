@@ -1,7 +1,7 @@
-import { Card, CardContent } from './ui/card'
-import { TableSkeleton } from './Skeleton'
-import EmptyState from './EmptyState'
-import Pagination from './Pagination'
+import { Card, CardContent } from '@/components/ui/card'
+import { TableSkeleton } from '@/components/Skeleton'
+import EmptyState from '@/components/EmptyState'
+import Pagination from '@/components/Pagination'
 
 export default function DataTable({ loading, skeleton = {}, isEmpty, emptyState, pagination, onPageChange, children }) {
   const { rows = 5, cols = 4 } = skeleton

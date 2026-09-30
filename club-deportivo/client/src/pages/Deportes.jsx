@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { deporteSchema } from '../schemas'
+import { deporteSchema } from '@/schemas'
 import { Plus, Edit, Trash2, Users, Trophy } from 'lucide-react'
-import { formatCurrency } from '../lib/utils'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
-import { Badge } from '../components/ui/badge'
-import { Card, CardContent } from '../components/ui/card'
+import { formatCurrency } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../components/ui/dialog'
-import { CardSkeleton } from '../components/Skeleton'
-import EmptyState from '../components/EmptyState'
-import { useDeportes, useCreateDeporte, useUpdateDeporte, useDeleteDeporte } from '../hooks/useDeportes'
+} from '@/components/ui/dialog'
+import { CardSkeleton } from '@/components/Skeleton'
+import EmptyState from '@/components/EmptyState'
+import { useDeportes, useCreateDeporte, useUpdateDeporte, useDeleteDeporte } from '@/hooks/useDeportes'
 
 export default function Deportes() {
   const [modalOpen, setModalOpen] = useState(false)

@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { portalService } from '../services'
-import { getApiError } from '../lib/api'
-import { queryKeys } from './queryKeys'
+import { portalService } from '@/services'
+import { getApiError } from '@/lib/api'
+import { queryKeys } from '@/hooks/queryKeys'
 
 export function usePortalData() {
   return useQuery({

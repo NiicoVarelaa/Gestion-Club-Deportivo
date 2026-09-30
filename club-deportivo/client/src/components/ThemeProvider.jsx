@@ -1,4 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { readStored, writeStored } from '@/lib/storage'
+
+const THEMES = ['light', 'dark']
 
 const ThemeContext = createContext({
   theme: 'light',
@@ -6,21 +9,17 @@ const ThemeContext = createContext({
 })
 
 export function ThemeProvider({ children }) {
+  // A value written by an older build, or hand-edited in devtools, must not be
+  // able to put the app in a theme that does not exist.
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') || 'light'
-    }
-    return 'light'
+    const stored = readStored('theme', { fallback: 'light' })
+    return THEMES.includes(stored) ? stored : 'light'
   })
 
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-    localStorage.setItem('theme', theme)
+    root.classList.toggle('dark', theme === 'dark')
+    writeStored('theme', theme)
   }, [theme])
 
   const toggleTheme = () => {

@@ -2,20 +2,20 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { pagoSchema } from '../schemas'
+import { pagoSchema } from '@/schemas'
 import { Plus, AlertTriangle, CheckCircle, Clock, RefreshCw, CreditCard, FileDown } from 'lucide-react'
-import { formatCurrency, formatDate, MESES, selectClassName } from '../lib/utils'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
-import { Badge } from '../components/ui/badge'
+import { formatCurrency, formatDate, MESES, selectClassName } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -23,13 +23,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../components/ui/table'
-import DataTable from '../components/DataTable'
-import SocioSelect from '../components/SocioSelect'
-import { exportToPDF, exportToExcel, pagosExportColumns, formatPagoForExport } from '../lib/export'
-import { usePagos, useDeudas, useCreatePago, useGenerateCuotas } from '../hooks/usePagos'
-import { useSocioOptions } from '../hooks/useSocios'
-import { useDeportes } from '../hooks/useDeportes'
+} from '@/components/ui/table'
+import DataTable from '@/components/DataTable'
+import SocioSelect from '@/components/SocioSelect'
+import { exportToPDF, exportToExcel, pagosExportColumns, formatPagoForExport } from '@/lib/export'
+import { usePagos, useDeudas, useCreatePago, useGenerateCuotas } from '@/hooks/usePagos'
+import { useSocioOptions } from '@/hooks/useSocios'
+import { useDeportes } from '@/hooks/useDeportes'
 
 const estadoIcon = {
   PAGADO: CheckCircle,

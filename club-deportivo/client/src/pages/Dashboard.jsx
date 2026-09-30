@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom'
 import { Users, Trophy, CreditCard, AlertTriangle, TrendingUp, FileText, LayoutDashboardIcon } from 'lucide-react'
-import { formatCurrency } from '../lib/utils'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { StatsSkeleton } from '../components/Skeleton'
-import EmptyState from '../components/EmptyState'
+import { formatCurrency } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { StatsSkeleton } from '@/components/Skeleton'
+import EmptyState from '@/components/EmptyState'
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
-import { useDashboard } from '../hooks/usePagos'
+import { useDashboard } from '@/hooks/usePagos'
 
 const statsCards = [
   { key: 'sociosActivos', label: 'Socios Activos', icon: Users, color: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400' },

@@ -16,20 +16,30 @@ vi.mock('axios', () => ({
   },
 }))
 
-import api, { getApiError } from './api.js'
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: { getState: vi.fn() },
+}))
+
+import api, { getApiError } from '@/lib/api'
+import { useAuthStore } from '@/stores/authStore'
 
 const requestHandler = interceptorsMock.request.use.mock.calls[0][0]
 const responseHandler = interceptorsMock.response.use.mock.calls[0][0]
 const responseErrorHandler = interceptorsMock.response.use.mock.calls[0][1]
 
+function mockStore(session, expireSession = vi.fn()) {
+  useAuthStore.getState.mockReturnValue({ session, expireSession })
+  return expireSession
+}
+
 describe('api interceptors', () => {
   beforeEach(() => {
-    localStorage.clear()
     vi.clearAllMocks()
+    mockStore(null)
   })
 
-  it('adds the Authorization header from localStorage', () => {
-    localStorage.setItem('supabase_token', 'tok')
+  it('adds the Authorization header from the session in the store', () => {
+    mockStore({ access_token: 'tok' })
     const config = { headers: {} }
 
     const result = requestHandler(config)
@@ -37,7 +47,26 @@ describe('api interceptors', () => {
     expect(result.headers.Authorization).toBe('Bearer tok')
   })
 
-  it('passes through when there is no token', () => {
+  it('prefers the store over a leftover supabase_token in localStorage', () => {
+    localStorage.setItem('supabase_token', 'stale-token')
+    mockStore({ access_token: 'store-token' })
+    const config = { headers: {} }
+
+    const result = requestHandler(config)
+
+    expect(result.headers.Authorization).toBe('Bearer store-token')
+  })
+
+  it('passes through when there is no session', () => {
+    const config = { headers: {} }
+
+    const result = requestHandler(config)
+
+    expect(result.headers.Authorization).toBeUndefined()
+  })
+
+  it('passes through when the session exists but carries no token', () => {
+    mockStore({ user: { id: 'u1' } })
     const config = { headers: {} }
 
     const result = requestHandler(config)
@@ -50,22 +79,22 @@ describe('api interceptors', () => {
     expect(responseHandler(res)).toBe(res)
   })
 
-  it('clears the token and rejects on 401', async () => {
-    localStorage.setItem('supabase_token', 'tok')
+  it('expires the store session on 401', async () => {
+    const expireSession = mockStore({ access_token: 'tok' })
     const err = { response: { status: 401 } }
 
     await expect(responseErrorHandler(err)).rejects.toBe(err)
 
-    expect(localStorage.getItem('supabase_token')).toBeNull()
+    expect(expireSession).toHaveBeenCalledTimes(1)
   })
 
-  it('rejects non-401 errors without clearing the token', async () => {
-    localStorage.setItem('supabase_token', 'tok')
+  it('rejects non-401 errors without expiring the session', async () => {
+    const expireSession = mockStore({ access_token: 'tok' })
     const err = { response: { status: 500 } }
 
     await expect(responseErrorHandler(err)).rejects.toBe(err)
 
-    expect(localStorage.getItem('supabase_token')).toBe('tok')
+    expect(expireSession).not.toHaveBeenCalled()
   })
 
   it('creates the axios instance through the mocked create', () => {

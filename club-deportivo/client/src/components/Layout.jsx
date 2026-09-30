@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../stores/authStore'
-import { useUIStore } from '../stores/uiStore'
-import { useTheme } from './ThemeProvider'
+import { useAuthStore } from '@/stores/authStore'
+import { useUIStore } from '@/stores/uiStore'
+import { useTheme } from '@/components/ThemeProvider'
 import {
   LayoutDashboard,
   Users,
@@ -15,17 +15,17 @@ import {
   Sun,
   UserCircle,
 } from 'lucide-react'
-import { cn } from '../lib/utils'
-import { Button } from './ui/button'
-import { Badge } from './ui/badge'
-import { useDashboard } from '../hooks/usePagos'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { usePagosVencidosCount } from '@/hooks/usePagos'
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/socios', label: 'Socios', icon: Users },
   { path: '/admin/deportes', label: 'Deportes', icon: Trophy },
   { path: '/admin/inscripciones', label: 'Inscripciones', icon: FileText },
-  { path: '/admin/pagos', label: 'Pagos', icon: CreditCard },
+  { path: '/admin/pagos', label: 'Pagos', icon: CreditCard, badge: 'pagosVencidos' },
 ]
 
 export default function Layout() {
@@ -35,7 +35,7 @@ export default function Layout() {
   const { sidebarOpen, toggleSidebar, closeSidebar } = useUIStore()
   const { theme, toggleTheme } = useTheme()
 
-  const { data: dashData } = useDashboard()
+  const { data: pagosVencidos } = usePagosVencidosCount()
 
   const handleLogout = async () => {
     await logout()
@@ -87,9 +87,9 @@ export default function Layout() {
                 >
                   <item.icon className="h-5 w-5" />
                   <span className="flex-1">{item.label}</span>
-                  {item.path === '/pagos' && dashData?.pagosVencidos > 0 && (
+                  {item.badge === 'pagosVencidos' && pagosVencidos > 0 && (
                     <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0">
-                      {dashData.pagosVencidos}
+                      {pagosVencidos}
                     </Badge>
                   )}
                 </Link>

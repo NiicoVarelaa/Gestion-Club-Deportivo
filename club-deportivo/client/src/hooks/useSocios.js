@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { sociosService } from '../services'
-import { getApiError } from '../lib/api'
-import { queryKeys } from './queryKeys'
-import { cleanParams } from './cleanParams'
+import { sociosService } from '@/services'
+import { getApiError } from '@/lib/api'
+import { queryKeys } from '@/hooks/queryKeys'
+import { cleanParams } from '@/hooks/cleanParams'
 
 export function useSocios({ search, page, limit } = {}) {
   const params = cleanParams({ search, page, limit })

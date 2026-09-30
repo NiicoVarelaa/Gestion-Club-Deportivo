@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { supabase } from '../lib/supabase'
-import { useAuthStore } from './authStore.js'
+import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/authStore'
 
-vi.mock('../lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
       getSession: vi.fn(),
@@ -34,10 +34,7 @@ function trackSubscriptions() {
 }
 
 function resolveSession(session) {
-  supabase.auth.getSession.mockResolvedValue({
-    data: { session },
-    error: null,
-  })
+  supabase.auth.getSession.mockResolvedValue({ data: { session }, error: null })
 }
 
 const activeSubs = (subs) => subs.filter((s) => s.active)
@@ -45,7 +42,6 @@ const activeSubs = (subs) => subs.filter((s) => s.active)
 describe('useAuthStore', () => {
   beforeEach(() => {
     useAuthStore.setState({ user: null, session: null, loading: true })
-    localStorage.clear()
     vi.clearAllMocks()
     supabase.auth.getSession.mockResolvedValue({ data: { session: null }, error: null })
     supabase.auth.signOut.mockResolvedValue({ error: null })
@@ -83,7 +79,7 @@ describe('useAuthStore', () => {
       expect(subs[0].unsubscribe).toHaveBeenCalledTimes(1)
     })
 
-    it('restores the session and token from getSession', async () => {
+    it('restores the session from getSession', async () => {
       const session = { access_token: 'tok', user: { id: 'u1' } }
       resolveSession(session)
       trackSubscriptions()
@@ -94,7 +90,6 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().session).toEqual(session)
       expect(useAuthStore.getState().user).toEqual({ id: 'u1' })
       expect(useAuthStore.getState().loading).toBe(false)
-      expect(localStorage.getItem('supabase_token')).toBe('tok')
     })
 
     it('keeps loading true until getSession resolves', async () => {
@@ -115,15 +110,16 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().loading).toBe(false)
     })
 
-    it('leaves no token behind when there is no session', async () => {
-      localStorage.setItem('supabase_token', 'stale')
+    it('leaves no session behind when there is none', async () => {
+      useAuthStore.setState({ session: { access_token: 'stale' }, user: { id: 'u1' } })
       resolveSession(null)
       trackSubscriptions()
 
       useAuthStore.getState().init()
       await flush()
 
-      expect(localStorage.getItem('supabase_token')).toBeNull()
+      expect(useAuthStore.getState().session).toBeNull()
+      expect(useAuthStore.getState().user).toBeNull()
     })
 
     it('leaves a single active listener across a StrictMode remount', () => {
@@ -160,7 +156,7 @@ describe('useAuthStore', () => {
       resolvers[1]({ data: { session: { access_token: 'fresh' } }, error: null })
       await flush()
 
-      expect(localStorage.getItem('supabase_token')).toBe('fresh')
+      expect(useAuthStore.getState().session?.access_token).toBe('fresh')
     })
 
     it('ignores auth events emitted after cleanup', () => {
@@ -171,12 +167,30 @@ describe('useAuthStore', () => {
       subs[0].callback('SIGNED_IN', { access_token: 'tok', user: { id: 'u1' } })
 
       expect(useAuthStore.getState().session).toBeNull()
-      expect(localStorage.getItem('supabase_token')).toBeNull()
+    })
+
+    it('does not let a refresh landing mid startup lose to the older session', async () => {
+      const resolvers = []
+      supabase.auth.getSession.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolvers.push(resolve)
+          })
+      )
+      const subs = trackSubscriptions()
+
+      useAuthStore.getState().init()
+      subs[0].callback('TOKEN_REFRESHED', { access_token: 'fresh', user: { id: 'u1' } })
+
+      resolvers[0]({ data: { session: { access_token: 'stale' } }, error: null })
+      await flush()
+
+      expect(useAuthStore.getState().session?.access_token).toBe('fresh')
     })
   })
 
   describe('auth state changes', () => {
-    it('updates the session, the user and the token', () => {
+    it('updates the session and the user', () => {
       const subs = trackSubscriptions()
       useAuthStore.getState().init()
       const session = { access_token: 'fresh', user: { id: 'u9' } }
@@ -186,19 +200,17 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().session).toEqual(session)
       expect(useAuthStore.getState().user).toEqual({ id: 'u9' })
       expect(useAuthStore.getState().loading).toBe(false)
-      expect(localStorage.getItem('supabase_token')).toBe('fresh')
     })
 
-    it('clears the token when the session ends', () => {
+    it('clears the session when it ends', () => {
       const subs = trackSubscriptions()
       useAuthStore.getState().init()
-      localStorage.setItem('supabase_token', 'tok')
+      useAuthStore.getState().applySession({ access_token: 'tok', user: { id: 'u1' } })
 
       subs[0].callback('SIGNED_OUT', null)
 
       expect(useAuthStore.getState().session).toBeNull()
       expect(useAuthStore.getState().user).toBeNull()
-      expect(localStorage.getItem('supabase_token')).toBeNull()
     })
   })
 
@@ -211,21 +223,20 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().session).toEqual(session)
       expect(useAuthStore.getState().user).toEqual({ id: 'u2' })
       expect(useAuthStore.getState().loading).toBe(false)
-      expect(localStorage.getItem('supabase_token')).toBe('from-server')
     })
 
     it('clears everything when passed null', () => {
-      localStorage.setItem('supabase_token', 'tok')
+      useAuthStore.getState().applySession({ access_token: 'tok', user: { id: 'u1' } })
 
       useAuthStore.getState().applySession(null)
 
       expect(useAuthStore.getState().session).toBeNull()
-      expect(localStorage.getItem('supabase_token')).toBeNull()
+      expect(useAuthStore.getState().user).toBeNull()
     })
   })
 
   describe('login', () => {
-    it('sets the user and session and stores the token', async () => {
+    it('sets the session and the user', async () => {
       const user = { id: 'u1', email: 'test@example.com' }
       const session = { access_token: 'token123', user }
       supabase.auth.signInWithPassword.mockResolvedValue({
@@ -243,7 +254,6 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().user).toEqual(user)
       expect(useAuthStore.getState().session).toEqual(session)
       expect(useAuthStore.getState().loading).toBe(false)
-      expect(localStorage.getItem('supabase_token')).toBe('token123')
     })
 
     it('throws when supabase returns an error', async () => {
@@ -257,8 +267,11 @@ describe('useAuthStore', () => {
       ).rejects.toThrow('Invalid credentials')
     })
 
-    it('leaves no token behind on failure', async () => {
-      localStorage.setItem('supabase_token', 'stale')
+    it('leaves the previous session untouched on failure', async () => {
+      useAuthStore.setState({
+        session: { access_token: 'stale', user: { id: 'u1' } },
+        user: { id: 'u1' },
+      })
       supabase.auth.signInWithPassword.mockResolvedValue({
         data: { session: null, user: null },
         error: { message: 'Invalid credentials' },
@@ -268,14 +281,45 @@ describe('useAuthStore', () => {
         useAuthStore.getState().login('test@example.com', 'pass')
       ).rejects.toThrow()
 
-      expect(localStorage.getItem('supabase_token')).toBe('stale')
+      expect(useAuthStore.getState().session?.access_token).toBe('stale')
+    })
+  })
+
+  describe('expireSession', () => {
+    it('signs out and clears the state', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' },
+        session: { access_token: 'token123' },
+      })
+
+      await useAuthStore.getState().expireSession()
+
+      expect(supabase.auth.signOut).toHaveBeenCalled()
+      expect(useAuthStore.getState().user).toBeNull()
+      expect(useAuthStore.getState().session).toBeNull()
+      expect(useAuthStore.getState().loading).toBe(false)
+    })
+
+    it('clears local state even when signOut fails, so the app can still log out', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' },
+        session: { access_token: 'token123' },
+      })
+      supabase.auth.signOut.mockRejectedValue(new Error('network down'))
+
+      await useAuthStore.getState().expireSession()
+
+      expect(useAuthStore.getState().user).toBeNull()
+      expect(useAuthStore.getState().session).toBeNull()
     })
   })
 
   describe('logout', () => {
-    it('clears the user, session and token', async () => {
-      useAuthStore.setState({ user: { id: 'u1' }, session: { access_token: 'token123' } })
-      localStorage.setItem('supabase_token', 'token123')
+    it('clears the user and the session', async () => {
+      useAuthStore.setState({
+        user: { id: 'u1' },
+        session: { access_token: 'token123' },
+      })
 
       await useAuthStore.getState().logout()
 
@@ -283,18 +327,19 @@ describe('useAuthStore', () => {
       expect(useAuthStore.getState().user).toBeNull()
       expect(useAuthStore.getState().session).toBeNull()
       expect(useAuthStore.getState().loading).toBe(false)
-      expect(localStorage.getItem('supabase_token')).toBeNull()
     })
 
     it('clears local state even when signOut fails, so the app can still log out', async () => {
-      useAuthStore.setState({ user: { id: 'u1' }, session: { access_token: 'token123' } })
-      localStorage.setItem('supabase_token', 'token123')
+      useAuthStore.setState({
+        user: { id: 'u1' },
+        session: { access_token: 'token123' },
+      })
       supabase.auth.signOut.mockRejectedValue(new Error('network down'))
 
       await useAuthStore.getState().logout()
 
       expect(useAuthStore.getState().user).toBeNull()
-      expect(localStorage.getItem('supabase_token')).toBeNull()
+      expect(useAuthStore.getState().session).toBeNull()
     })
   })
 })

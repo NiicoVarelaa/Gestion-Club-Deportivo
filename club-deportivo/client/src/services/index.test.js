@@ -6,7 +6,7 @@ import {
   pagosService,
   publicService,
   portalService,
-} from './index.js'
+} from '@/services/index'
 
 const { apiMock } = vi.hoisted(() => ({
   apiMock: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import * as XLSX from 'xlsx'
-import { formatCurrency, formatDate, MESES } from '../lib/utils'
+import { formatCurrency, formatDate, MESES } from '@/lib/utils'
 
 export function exportToPDF({ title, columns, rows, filename = 'reporte' }) {
   const doc = new jsPDF()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { socioSchema, deporteSchema, inscripcionSchema, pagoSchema, loginSchema, registroSchema, socioLoginSchema } from './index.js'
+import { socioSchema, deporteSchema, inscripcionSchema, pagoSchema, loginSchema, registroSchema, socioLoginSchema } from '@/schemas/index'
 
 describe('socioSchema', () => {
   it('validates a correct socio', () => {
