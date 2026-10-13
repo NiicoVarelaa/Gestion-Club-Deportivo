@@ -3,7 +3,7 @@ import { useUIStore } from '@/stores/uiStore'
 
 describe('useUIStore', () => {
   beforeEach(() => {
-    useUIStore.setState({ sidebarOpen: false })
+    useUIStore.setState({ sidebarOpen: false, sidebarCollapsed: false })
   })
 
   it('starts with the sidebar closed', () => {
@@ -24,5 +24,17 @@ describe('useUIStore', () => {
     useUIStore.getState().closeSidebar()
 
     expect(useUIStore.getState().sidebarOpen).toBe(false)
+  })
+
+  it('starts with the sidebar expanded', () => {
+    expect(useUIStore.getState().sidebarCollapsed).toBe(false)
+  })
+
+  it('toggleCollapsed toggles the collapsed state', () => {
+    useUIStore.getState().toggleCollapsed()
+    expect(useUIStore.getState().sidebarCollapsed).toBe(true)
+
+    useUIStore.getState().toggleCollapsed()
+    expect(useUIStore.getState().sidebarCollapsed).toBe(false)
   })
 })
