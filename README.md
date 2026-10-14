@@ -156,9 +156,10 @@ Flujo completo de recuperación de contraseña con envío de email vía Supabase
 - Búsqueda con debounce (300ms), paginación numerada, skeleton loaders y estados vacíos
 - Dashboard con gráficos interactivos (Recharts): torta de estados de pago, barras de recaudación mensual
 - Estados de pago: `PAGADO`, `PENDIENTE`, `VENCIDO` con badge de deudas en sidebar
+- **Sidebar rediseñado** con gradiente de marca, navegación con estado activo y modo colapsable (solo íconos) en desktop; se expande como drawer en mobile
 - Generación automática de cuotas mensuales (un click)
 - Exportación a **PDF** (jsPDF + autotable) y **Excel** (xlsx)
-- Tema oscuro persistiendo en `localStorage`
+- Tema claro/oscuro con preferencia persistida vía `@/lib/storage`
 - Perfil de usuario editable (nombre/apellido/cambio de password)
 - Lazy loading por ruta con `React.lazy` + `Suspense`
 - Totalmente responsive (mobile-first)
@@ -182,7 +183,7 @@ Flujo completo de recuperación de contraseña con envío de email vía Supabase
 │                      Render                          │
 │  ┌────────────────────────────────────────────────┐  │
 │  │         Express API (Node.js)                  │  │
-│  │  Prisma / Zod / Pino / Helmet / CORS           │  │
+│  │  Supabase / Zod / Pino / Helmet / CORS         │  │
 │  │  Auth + Portal + Admin endpoints               │  │
 │  └────────────────────┬───────────────────────────┘  │
 └───────────────────────┼─────────────────────────────┘
@@ -200,11 +201,11 @@ Flujo completo de recuperación de contraseña con envío de email vía Supabase
 | ---- | ---------- |
 | Runtime | Node.js 20+ |
 | API | Express 4.21 + cors + helmet + compression + rate-limit |
-| ORM | Prisma 6.5 (PostgreSQL) |
+| Acceso a datos | Supabase JS (`service_role`) en runtime; Prisma solo para `schema.prisma` y migraciones |
 | Validación | Zod 3.24 (server + client) |
 | Auth | Supabase Auth |
 | Frontend | React 19.0 + Vite 8 + Tailwind CSS 3.4 |
-| Estado | Zustand 5 + React Query 5 |
+| Estado | React Query 5 (datos de servidor) + Zustand 5 (sesión y UI) |
 | Formularios | React Hook Form 7 + `@hookform/resolvers` |
 | Animaciones | Framer Motion 12 |
 | UI | shadcn/ui + Radix primitives + Lucide React |
@@ -223,34 +224,36 @@ Flujo completo de recuperación de contraseña con envío de email vía Supabase
 club-deportivo/
 ├── server/                          # Backend Express
 │   ├── prisma/
-│   │   └── schema.prisma            # Modelo de datos
+│   │   └── schema.prisma            # Modelo de datos (solo migraciones)
 │   ├── src/
 │   │   ├── index.js                 # Servidor principal + graceful shutdown
-│   │   ├── controllers/             # socios, deportes, pagos, auth, portal
-│   │   ├── routes/                  # auth, socios, deportes, pagos, portal
-│   │   ├── middleware/              # asyncHandler, autenticación, roles, errores
-│   │   └── utils/                   # validaciones Zod, Supabase client, logger
-│   ── tests/
-│       └── validations.test.js      # Tests de esquemas Zod
+│   │   ├── app.js                   # Configuración de Express + middlewares
+│   │   ├── controllers/             # socios, deportes, inscripciones, pagos, auth, portal
+│   │   ├── routes/                  # auth, socios, deportes, inscripciones, pagos, portal
+│   │   ├── middleware/              # asyncHandler, autenticación/roles, errores
+│   │   └── utils/                   # validaciones Zod, cliente Supabase (service_role), logger, paginación
+│   └── tests/
+│       ├── validations.test.js      # Tests de esquemas Zod
+│       └── api.test.js              # Tests de endpoints
 ├── client/                          # Frontend React
 │   ├── src/
 │   │   ├── main.jsx                 # Entry point
 │   │   ├── App.jsx                  # Router (public + portal + admin)
 │   │   ├── pages/
-│   │   │   ├── public/              # Landing, Registro
+│   │   │   ├── public/              # Landing, Registro, Términos, Recuperar contraseña
 │   │   │   ├── portal/              # PortalDashboard, PortalPerfil, PortalDeportes, PortalPagos
 │   │   │   └── *.jsx                # Admin pages (Dashboard, Socios, etc.)
 │   │   ├── components/
 │   │   │   ├── landings/            # HeroSection, SportsGrid, BenefitsSection
 │   │   │   ├── ui/                  # shadcn/ui (15 componentes)
-│   │   │   └── *.jsx                # Layout, Modal, Skeleton, Pagination, etc.
-│   │   ├── stores/                  # authStore, socioStore, uiStore
+│   │   │   └── *.jsx                # Layout (sidebar), Modal, Skeleton, Pagination, etc.
+│   │   ├── stores/                  # authStore (sesión), uiStore (sidebar/UI)
 │   │   ├── schemas/                 # Zod schemas + tests
-│   │   ├── services/                # API services (socios, deportes, pagos, public, portal)
-│   │   ├── hooks/                   # useDebounce + tests
-│   │   └── lib/                     # api client, supabase, utils, export
-│   ── public/
-│       └── favicon.svg
+│   │   ├── services/                # services/index.js (API por recurso)
+│   │   ├── hooks/                   # hooks de React Query por endpoint + queryKeys + useDebounce
+│   │   └── lib/                     # api client, supabase, storage, utils, export
+│   └── public/
+│       └── favicon.png
 ├── screenshots/                     # Capturas para portfolio
 ├── package.json                     # pnpm workspace root + overrides
 ├── pnpm-workspace.yaml
@@ -494,8 +497,8 @@ pnpm db:migrate          # Crear migración
 pnpm -F server seed-demo  # Carga datos demo (socio, deportes, pagos)
 
 # Tests
-pnpm -F server test:run  # Tests del backend (19 tests)
-pnpm -F client test:run  # Tests del frontend (25 tests)
+pnpm -F server test:run  # Tests del backend (67 tests)
+pnpm -F client test:run  # Tests del frontend (192 tests)
 
 # Lint
 pnpm -F client lint      # ESLint
@@ -507,12 +510,12 @@ pnpm -F client lint      # ESLint
 
 | Paquete | Tests | Framework | Descripción |
 | ------- | ----- | --------- | ----------- |
-| `server` | 19 | Vitest | Validaciones Zod (socios, deportes, pagos) |
-| `client` | 25 | Vitest | Zod schemas + hook `useDebounce` + integración |
+| `server` | 67 | Vitest | Validaciones Zod, middlewares (auth, errores, asyncHandler), paginación y endpoints |
+| `client` | 192 | Vitest | Componentes, stores, servicios, API client, hooks de React Query (incluye invalidaciones), `useDebounce` y schemas Zod |
 
 ```bash
-pnpm -F server test:run   # 19 passed
-pnpm -F client test:run   # 25 passed
+pnpm -F server test:run   # 67 passed
+pnpm -F client test:run   # 192 passed
 ```
 
 ---
@@ -556,7 +559,9 @@ En el dashboard de Supabase, ir a **Authentication > URL Configuration**:
 
 - **React 19.0**: upgrade desde React 18.3, eliminando `@supabase/auth-ui-react` que bloqueaba la actualización
 - **pnpm 11.1** pineado en `package.json` con `packageManager` para compatibilidad con Vercel
-- **Prisma** como ORM por type-safety y migraciones; Supabase para queries runtime
+- **Prisma** queda solo para `schema.prisma` y migraciones; el acceso a datos en runtime pasa por `supabase.from(...)` con el cliente `service_role`
+- **Estado**: React Query para datos del servidor (un hook por endpoint con invalidación de `queryKeys`); Zustand solo para sesión (`authStore`) y UI (`uiStore`)
+- **Persistencia**: `@/lib/storage` versiona las claves y envuelve `localStorage` en `try/catch`
 - **Framer Motion** para animaciones de la landing (staggered reveals, hover effects, parallax nav)
 - **Pino** para logging estructurado en producción (JSON), pretty-print en desarrollo
 - **Compression** middleware para gzip automático de responses
@@ -564,7 +569,7 @@ En el dashboard de Supabase, ir a **Authentication > URL Configuration**:
 - Todas las rutas de API montadas bajo `/api/`
 - **Sanitización HTML** en todos los inputs de texto vía Zod transforms
 - **Role-based access**: middleware `requireAdmin` verifica `user_metadata.role`
-- **Tema oscuro**: implementación propia via `ThemeProvider` + `localStorage`
+- **Tema oscuro**: implementación propia vía `ThemeProvider`; la preferencia se persiste con `@/lib/storage` (claves versionadas), no `localStorage` directo
 - **`service_role` key** solo en backend; el frontend usa `anon` key
 - **Lazy loading** en todas las rutas con `React.lazy` + `Suspense`
 - **Portal del socio** separado del admin: mismo auth, diferente UI y permisos
