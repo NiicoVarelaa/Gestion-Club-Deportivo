@@ -21,7 +21,7 @@ export default function Terminos() {
 
           <h2>1. Aceptación de los Términos</h2>
           <p>
-            Al acceder y utilizar la plataforma GesClub (en adelante, "la Plataforma"), usted acepta 
+            Al acceder y utilizar la plataforma GesClub (en adelante, &ldquo;la Plataforma&rdquo;), usted acepta 
             estar sujeto a los presentes Términos y Condiciones. Si no está de acuerdo con alguna 
             parte de estos términos, no podrá acceder ni utilizar nuestros servicios.
           </p>
@@ -72,7 +72,7 @@ export default function Terminos() {
           <p>
             GesClub no será responsable por daños directos, indirectos, incidentales o 
             consecuentes derivados del uso o la imposibilidad de uso de la Plataforma. La 
-            Plataforma se proporciona "tal cual", sin garantías de ningún tipo.
+            Plataforma se proporciona &ldquo;tal cual&rdquo;, sin garantías de ningún tipo.
           </p>
 
           <h2>8. Modificaciones</h2>

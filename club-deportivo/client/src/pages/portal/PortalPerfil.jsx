@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,15 +13,14 @@ export default function PortalPerfil() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ nombre: '', apellido: '', telefono: '' })
 
-  useEffect(() => {
-    if (socio && !editing) {
-      setForm({
-        nombre: socio.nombre || '',
-        apellido: socio.apellido || '',
-        telefono: socio.telefono || '',
-      })
-    }
-  }, [socio, editing])
+  const startEditing = () => {
+    setForm({
+      nombre: socio?.nombre || '',
+      apellido: socio?.apellido || '',
+      telefono: socio?.telefono || '',
+    })
+    setEditing(true)
+  }
 
   const mutation = useUpdatePortalProfile({
     onSuccess: () => setEditing(false),
@@ -66,7 +65,7 @@ export default function PortalPerfil() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Mi Perfil</h1>
         {!editing && (
-          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+          <Button variant="outline" size="sm" onClick={startEditing}>
             <Pencil className="w-4 h-4 mr-1" />
             Editar
           </Button>
@@ -121,7 +120,7 @@ export default function PortalPerfil() {
                 />
               </div>
 
-              {infoItems.map(({ icon: Icon, label, value }, index) => (
+              {infoItems.map(({ icon: Icon, label, value }) => (
                 <div key={label}>
                   <Separator />
                   <div className="flex items-center gap-3 pt-4">
@@ -172,7 +171,7 @@ export default function PortalPerfil() {
                 </div>
               </div>
 
-              {infoItems.map(({ icon: Icon, label, value }, index) => (
+              {infoItems.map(({ icon: Icon, label, value }) => (
                 <div key={label}>
                   <Separator className="mb-4" />
                   <div className="flex items-center gap-3">

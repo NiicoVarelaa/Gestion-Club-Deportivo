@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+defaults:
+  run:
+    working-directory: club-deportivo
+
+jobs:
+  client:
+    name: Client (lint + tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: club-deportivo/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -F gesclub-client lint
+      - run: pnpm -F gesclub-client test:run
+
+  server:
+    name: Server (tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: club-deportivo/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -F gesclub-server test:run
