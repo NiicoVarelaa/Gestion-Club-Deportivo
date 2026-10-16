@@ -4,7 +4,8 @@
 
 # GesClub — Sistema de Gestión Deportiva
 
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs)](https://nodejs.org/)
+[![CI](https://github.com/NiicoVarelaa/Gestion-Club-Deportivo/actions/workflows/ci.yml/badge.svg)](https://github.com/NiicoVarelaa/Gestion-Club-Deportivo/actions/workflows/ci.yml)
+[![Node.js](https://img.shields.io/badge/Node.js-22.13+-339933?logo=nodedotjs)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express)](https://expressjs.com/)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)](https://vitejs.dev/)
@@ -199,7 +200,7 @@ Flujo completo de recuperación de contraseña con envío de email vía Supabase
 
 | Capa | Tecnología |
 | ---- | ---------- |
-| Runtime | Node.js 20+ |
+| Runtime | Node.js 22.13+ |
 | API | Express 4.21 + cors + helmet + compression + rate-limit |
 | Acceso a datos | Supabase JS (`service_role`) en runtime; Prisma solo para `schema.prisma` y migraciones |
 | Validación | Zod 3.24 (server + client) |
@@ -396,7 +397,7 @@ club-deportivo/
 
 ### Requisitos
 
-- **Node.js** 20+
+- **Node.js** 22.13+ (requerido por pnpm 11)
 - **pnpm** 11+
 - Cuenta en **[Supabase](https://supabase.com)** (gratuita)
 
@@ -517,6 +518,17 @@ pnpm -F client lint      # ESLint
 pnpm -F server test:run   # 67 passed
 pnpm -F client test:run   # 192 passed
 ```
+
+### Integración Continua
+
+GitHub Actions corre en cada push a `master`/`main` y en cada pull request (`.github/workflows/ci.yml`):
+
+| Job | Pasos |
+| --- | ----- |
+| `client` | `eslint` + `vitest run` (192 tests) |
+| `server` | `vitest run` (67 tests) |
+
+Usa Node.js 22.13 y pnpm 11.1.2. Ningún test necesita un `.env` local: los que tocan Supabase lo mockean.
 
 ---
 
