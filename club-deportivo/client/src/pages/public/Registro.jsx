@@ -7,42 +7,95 @@ import { publicService } from '@/services'
 import { getApiError } from '@/lib/api'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { User, Mail, Phone, CreditCard, Lock, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import {
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  Lock,
+  Loader2,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  ChevronRight,
+  Check,
+  Trophy,
+  Wallet,
+  Sparkles,
+} from 'lucide-react'
+
+const features = [
+  { icon: Trophy, title: 'Más de 10 disciplinas', desc: 'Fútbol, básquet, natación, tenis y muchas más.' },
+  { icon: Wallet, title: 'Cuotas online', desc: 'Consultá y gestioná tus pagos desde el portal.' },
+  { icon: Sparkles, title: 'Inscripción en minutos', desc: 'Completá tus datos y empezá a entrenar hoy.' },
+]
+
+const fieldBase =
+  'w-full h-12 rounded-xl border bg-transparent pl-11 pr-4 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50'
 
 function PasswordStrength({ password }) {
-  const strength = useMemo(() => {
-    if (!password) return { level: 0, label: '', color: '' }
+  const { level, label, color, text } = useMemo(() => {
+    if (!password) return { level: 0, label: '', color: '', text: '' }
     let score = 0
     if (password.length >= 8) score++
     if (/[A-Z]/.test(password)) score++
     if (/[0-9]/.test(password)) score++
     if (/[^A-Za-z0-9]/.test(password)) score++
 
-    if (score <= 1) return { level: 1, label: 'Débil', color: 'bg-red-500' }
-    if (score === 2) return { level: 2, label: 'Regular', color: 'bg-orange-500' }
-    if (score === 3) return { level: 3, label: 'Buena', color: 'bg-yellow-500' }
-    return { level: 4, label: 'Segura', color: 'bg-emerald-500' }
+    if (score <= 1) return { level: 1, label: 'Débil', color: 'bg-red-500', text: 'text-red-500' }
+    if (score === 2) return { level: 2, label: 'Regular', color: 'bg-orange-500', text: 'text-orange-500' }
+    if (score === 3) return { level: 3, label: 'Buena', color: 'bg-yellow-500', text: 'text-yellow-600' }
+    return { level: 4, label: 'Segura', color: 'bg-emerald-500', text: 'text-emerald-600' }
   }, [password])
+
+  const rules = [
+    { label: '8 caracteres', ok: password.length >= 8 },
+    { label: 'Una mayúscula', ok: /[A-Z]/.test(password) },
+    { label: 'Un número', ok: /[0-9]/.test(password) },
+  ]
 
   if (!password) return null
 
   return (
-    <div className="mt-2 space-y-1">
-      <div className="flex gap-1">
+    <div className="mt-2 space-y-2">
+      <div className="flex items-center gap-1">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i <= strength.level ? strength.color : 'bg-gray-200 dark:bg-gray-700'
-            }`}
+            className={cn(
+              'h-1 flex-1 rounded-full transition-colors duration-300',
+              i <= level ? color : 'bg-border',
+            )}
           />
         ))}
+        <span className={cn('ml-2 w-14 text-right text-xs font-medium', text)}>{label}</span>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Seguridad: <span className="font-medium" style={{ color: strength.level >= 3 ? '#10b981' : strength.level === 2 ? '#f59e0b' : '#ef4444' }}>{strength.label}</span>
-      </p>
+      <ul className="flex flex-wrap gap-x-4 gap-y-1">
+        {rules.map((rule) => (
+          <li
+            key={rule.label}
+            className={cn(
+              'flex items-center gap-1 text-xs',
+              rule.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground',
+            )}
+          >
+            <span
+              className={cn(
+                'flex h-3.5 w-3.5 items-center justify-center rounded-full border',
+                rule.ok
+                  ? 'border-emerald-500 bg-emerald-500 text-white'
+                  : 'border-muted-foreground/40',
+              )}
+            >
+              {rule.ok && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+            </span>
+            {rule.label}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
@@ -55,6 +108,14 @@ const inputIcons = {
   telefono: Phone,
   password: Lock,
 }
+
+const fields = [
+  { name: 'nombre', label: 'Nombre', placeholder: 'Nicolás', type: 'text', autoComplete: 'given-name' },
+  { name: 'apellido', label: 'Apellido', placeholder: 'Varela', type: 'text', autoComplete: 'family-name' },
+  { name: 'dni', label: 'DNI', placeholder: '12345678', type: 'text', inputMode: 'numeric', autoComplete: 'off' },
+  { name: 'telefono', label: 'Teléfono', placeholder: '1123456789', type: 'tel', inputMode: 'tel', autoComplete: 'tel' },
+  { name: 'email', label: 'Email', placeholder: 'juan@email.com', type: 'email', autoComplete: 'email', full: true },
+]
 
 export default function Registro() {
   const navigate = useNavigate()
@@ -98,186 +159,252 @@ export default function Registro() {
     }
   }
 
-  const fields = [
-    { name: 'nombre', label: 'Nombre', placeholder: 'Nicolás', type: 'text' },
-    { name: 'apellido', label: 'Apellido', placeholder: 'Varela', type: 'text' },
-    { name: 'dni', label: 'DNI', placeholder: '12345678', type: 'text' },
-    { name: 'email', label: 'Email', placeholder: 'juan@email.com', type: 'email' },
-    { name: 'telefono', label: 'Teléfono', placeholder: '1123456789', type: 'text' },
-  ]
-
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-950 dark:to-blue-950 py-4 px-4">
-      <div className="w-full max-w-lg">
+    <div className="grid min-h-dvh lg:grid-cols-2">
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-sidebar to-sidebar-accent p-10 text-sidebar-foreground lg:flex xl:p-14">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: "url('/club.webp')" }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-sidebar/85 via-sidebar-accent/70 to-sidebar/95"
+          aria-hidden="true"
+        />
+
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 flex items-center gap-3"
         >
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-2 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al inicio
-          </Link>
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+            <img src="/logo.png" alt="GesClub" className="h-8 w-auto" />
+          </div>
+          <div>
+            <p className="text-lg font-bold leading-tight">GesClub</p>
+            <p className="text-xs opacity-70">Sistema de gestión deportiva</p>
+          </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="relative z-10 max-w-md space-y-8"
         >
-          <Card className="overflow-hidden shadow-2xl border-0">
-            <div className="bg-gradient-to-r from-primary to-blue-700 px-6 py-5 text-white text-center">
-              <div className="flex justify-center mb-1">
-                <img src="/logo.png" alt="GesClub" className="h-10 w-auto" />
-              </div>
-              <CardTitle className="text-xl">Asociate ahora</CardTitle>
-              <CardDescription className="text-blue-100">
-                Completá tus datos y empezá a entrenar
-              </CardDescription>
+          <div className="space-y-3">
+            <h2 className="text-3xl font-extrabold leading-tight xl:text-4xl">
+              Sumate al club
+            </h2>
+            <p className="text-base text-sidebar-foreground/80">
+              Creá tu cuenta de socio y accedé a todo lo que el club tiene para vos.
+            </p>
+          </div>
+
+          <ul className="space-y-5">
+            {features.map((feature) => (
+              <li key={feature.title} className="flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                  <feature.icon className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold">{feature.title}</span>
+                  <span className="block text-sm text-sidebar-foreground/70">{feature.desc}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="relative z-10 text-xs text-sidebar-foreground/60"
+        >
+          &copy; {new Date().getFullYear()} GesClub. Todos los derechos reservados.
+        </motion.p>
+      </aside>
+
+      <main className="flex items-center justify-center bg-background px-4 py-8 sm:px-6 lg:px-10">
+        <div className="w-full max-w-lg">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6 flex items-center justify-center gap-3 lg:hidden"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sidebar to-sidebar-accent shadow-sm">
+              <img src="/logo.png" alt="GesClub" className="h-8 w-auto" />
+            </div>
+            <div>
+              <p className="text-lg font-bold leading-tight">GesClub</p>
+              <p className="text-xs text-muted-foreground">Sistema de gestión</p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
+            <div className="mb-4">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver al inicio
+              </Link>
             </div>
 
-            <CardContent className="p-6">
-              <motion.form
-                key={shakeKey}
-                animate={submitError ? { x: [0, -8, 8, -8, 8, -4, 4, 0] } : {}}
-                transition={{ duration: 0.4 }}
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-3"
-              >
-                {submitError && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm text-center"
-                  >
-                    {submitError}
-                  </motion.div>
-                )}
+            <Card className="border-border/60 shadow-lg shadow-black/5">
+              <CardContent className="p-6 sm:p-8">
+                <div className="mb-6 space-y-1.5">
+                  <h1 className="text-2xl font-bold tracking-tight">Asociate ahora</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Completá tus datos y empezá a entrenar.
+                  </p>
+                </div>
 
-                {fields.map(({ name, label, placeholder, type }, index) => {
-                  const Icon = inputIcons[name]
-                  return (
-                    <motion.div
-                      key={name}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + index * 0.05 }}
+                <motion.form
+                  key={shakeKey}
+                  animate={shakeKey ? { x: [0, -8, 8, -8, 8, -4, 4, 0] } : {}}
+                  transition={{ duration: 0.4 }}
+                  onSubmit={handleSubmit(onSubmit)}
+                  noValidate
+                  className="space-y-4"
+                >
+                  {submitError && (
+                    <div
+                      role="alert"
+                      className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
                     >
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                        {label}
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {fields.map(({ name, label, placeholder, type, autoComplete, inputMode, full }, index) => {
+                      const Icon = inputIcons[name]
+                      const hasError = Boolean(errors[name])
+                      return (
+                        <motion.div
+                          key={name}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.05 * index }}
+                          className={cn(full && 'sm:col-span-2')}
+                        >
+                          <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-foreground">
+                            {label}
+                          </label>
+                          <div className="relative">
+                            <Icon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <input
+                              id={name}
+                              type={type}
+                              placeholder={placeholder}
+                              autoComplete={autoComplete}
+                              inputMode={inputMode}
+                              aria-invalid={hasError}
+                              aria-describedby={hasError ? `${name}-error` : undefined}
+                              {...register(name)}
+                              className={cn(
+                                fieldBase,
+                                hasError
+                                  ? 'border-destructive focus-visible:ring-destructive'
+                                  : 'border-input focus-visible:border-primary',
+                              )}
+                            />
+                          </div>
+                          {hasError && (
+                            <p id={`${name}-error`} className="mt-1 text-xs font-medium text-destructive">
+                              {errors[name].message}
+                            </p>
+                          )}
+                        </motion.div>
+                      )
+                    })}
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 * fields.length }}
+                      className="sm:col-span-2"
+                    >
+                      <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-foreground">
+                        Contraseña
                       </label>
                       <div className="relative">
-                        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <input
-                          type={type}
-                          placeholder={placeholder}
-                          {...register(name)}
-                          className={`w-full h-10 pl-10 pr-4 rounded-xl border text-sm bg-transparent outline-none transition-all
-                            ${errors[name]
-                              ? 'border-red-300 dark:border-red-700'
-                              : 'border-gray-200 dark:border-gray-700 focus:border-gray-300 dark:focus:border-gray-600'
-                            }
-                            text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500
-                          `}
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Mínimo 8 caracteres"
+                          autoComplete="new-password"
+                          aria-invalid={Boolean(errors.password)}
+                          aria-describedby={errors.password ? 'password-error' : undefined}
+                          {...register('password')}
+                          className={cn(
+                            fieldBase,
+                            'pr-11',
+                            errors.password
+                              ? 'border-destructive focus-visible:ring-destructive'
+                              : 'border-input focus-visible:border-primary',
+                          )}
                         />
-                      </div>
-                      {errors[name] && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-red-500 text-xs mt-1"
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                          aria-pressed={showPassword}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
-                          {errors[name].message}
-                        </motion.p>
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      {errors.password && (
+                        <p id="password-error" className="mt-1 text-xs font-medium text-destructive">
+                          {errors.password.message}
+                        </p>
                       )}
+                      <PasswordStrength password={password} />
                     </motion.div>
-                  )
-                })}
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + fields.length * 0.05 }}
-                >
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                    Contraseña
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 8 caracteres"
-                      {...register('password')}
-                      className={`w-full h-10 pl-10 pr-10 rounded-xl border text-sm bg-transparent outline-none transition-all
-                        ${errors.password
-                          ? 'border-red-300 dark:border-red-700'
-                          : 'border-gray-200 dark:border-gray-700 focus:border-gray-300 dark:focus:border-gray-600'
-                        }
-                        text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500
-                      `}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
                   </div>
-                  {errors.password && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-xs mt-1"
-                    >
-                      {errors.password.message}
-                    </motion.p>
-                  )}
-                  <PasswordStrength password={password} />
-                </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Button
+                  <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-11 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        <Loader2 className="h-5 w-5 animate-spin" />
                         Asociando...
                       </>
                     ) : (
-                      'Asociarme'
+                      <>
+                        Asociarme
+                        <ChevronRight className="h-4 w-4" />
+                      </>
                     )}
-                  </Button>
-                </motion.div>
-              </motion.form>
+                  </button>
+                </motion.form>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mt-4 text-center"
-              >
-                <p className="text-sm text-muted-foreground">
+                <p className="mt-6 text-center text-sm text-muted-foreground">
                   ¿Ya sos socio?{' '}
-                  <Link to="/portal" className="font-semibold text-primary hover:underline transition-colors">
-                    Ingresá acá
+                  <Link to="/login" className="font-semibold text-primary hover:underline">
+                    Iniciá sesión
                   </Link>
                 </p>
-              </motion.div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </main>
     </div>
   )
 }
