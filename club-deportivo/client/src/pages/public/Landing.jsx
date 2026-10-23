@@ -56,6 +56,12 @@ export default function Landing() {
               Mi Cuenta
             </Link>
             <Link
+              to="/contacto"
+              className="hidden text-sm font-medium text-muted-foreground hover:text-foreground transition-colors sm:block"
+            >
+              Contacto
+            </Link>
+            <Link
               to="/registro"
               className="group inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
             >

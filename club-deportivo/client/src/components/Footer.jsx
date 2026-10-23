@@ -51,6 +51,7 @@ const contactInfo = [
 ]
 
 const legalLinks = [
+  { label: 'Contacto', to: '/contacto' },
   { label: 'Términos y Condiciones', to: '/terminos' },
   { label: 'Política de Privacidad', to: '/privacidad' },
   { label: 'Trabajá con nosotros', to: '#' },
