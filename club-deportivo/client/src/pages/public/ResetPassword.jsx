@@ -1,139 +1,333 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import AuthLayout from '@/components/auth/AuthLayout'
 import { useAuthStore } from '@/stores/authStore'
-import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Loader2,
+  Lock,
+  ShieldCheck,
+} from 'lucide-react'
+
+const features = [
+  {
+    icon: ShieldCheck,
+    title: 'Contraseña protegida',
+    desc: 'Tu nueva clave se cifra y nunca se comparte.',
+  },
+  {
+    icon: KeyRound,
+    title: 'Acceso inmediato',
+    desc: 'Al guardarla podés iniciar sesión al instante.',
+  },
+  {
+    icon: Clock,
+    title: 'Enlace con vigencia',
+    desc: 'Los enlaces de recuperación caducan por seguridad.',
+  },
+]
+
+const fieldBase =
+  'w-full h-12 rounded-xl border bg-transparent pl-11 pr-12 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50'
+
+function PasswordToggle({ visible, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+      aria-pressed={visible}
+      className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  )
+}
 
 export default function ResetPassword() {
   const navigate = useNavigate()
   const { updatePassword } = useAuthStore()
+  const authLoading = useAuthStore((s) => s.loading)
+  const [checking, setChecking] = useState(true)
+  const [linkError, setLinkError] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [done, setDone] = useState(false)
-  const [error, setError] = useState('')
 
   useEffect(() => {
+    if (authLoading) return undefined
+
     const timer = setTimeout(() => {
       if (!useAuthStore.getState().user) {
-        setError('Link inválido o expirado. Solicitá uno nuevo.')
+        setLinkError('El enlace es inválido o expiró.')
       }
-      setLoading(false)
-    }, 1500)
+      setChecking(false)
+    }, 1200)
+
     return () => clearTimeout(timer)
-  }, [])
+  }, [authLoading])
+
+  useEffect(() => {
+    if (!done) return undefined
+    const timer = setTimeout(() => navigate('/login'), 6000)
+    return () => clearTimeout(timer)
+  }, [done, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres')
+    setSubmitError('')
+
+    const next = {}
+    if (password.length < 8) next.password = 'La contraseña debe tener al menos 8 caracteres'
+    if (!confirm) next.confirm = 'Repetí tu contraseña'
+    else if (confirm !== password) next.confirm = 'Las contraseñas no coinciden'
+
+    setErrors(next)
+
+    const firstInvalid = ['password', 'confirm'].find((key) => next[key])
+    if (firstInvalid) {
+      document.getElementById(firstInvalid)?.focus()
       return
     }
-    setError('')
+
     setIsSubmitting(true)
     try {
       await updatePassword(password)
       setDone(true)
-      setTimeout(() => navigate('/login'), 3000)
     } catch (err) {
-      setError(err.message || 'Error al actualizar la contraseña')
+      setSubmitError(err.message || 'No pudimos actualizar la contraseña. Intentá de nuevo.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (loading) {
+  const layoutProps = {
+    asideTitle: 'Creá una contraseña nueva',
+    asideDescription: 'Elegí una clave segura y volvé a entrar a tu cuenta sin perder tu progreso.',
+    features,
+  }
+
+  if (checking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
+      <AuthLayout {...layoutProps}>
+        <Card className="border-border/60 shadow-lg shadow-black/5">
+          <CardContent className="flex flex-col items-center gap-4 p-10 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="space-y-1">
+              <h1 className="text-xl font-bold">Verificando enlace</h1>
+              <p className="text-sm text-muted-foreground">
+                Estamos validando tu solicitud de recuperación.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </AuthLayout>
+    )
+  }
+
+  if (linkError) {
+    return (
+      <AuthLayout {...layoutProps}>
+        <Card className="border-border/60 shadow-lg shadow-black/5">
+          <CardContent className="p-6 sm:p-8">
+            <div className="flex flex-col items-center gap-5 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <AlertCircle className="h-7 w-7" />
+              </span>
+              <div className="space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight">El enlace no es válido</h1>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Puede haber expirado o ya haberse usado. Solicitá uno nuevo para continuar con la
+                  recuperación.
+                </p>
+              </div>
+              <Link
+                to="/forgot-password"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Solicitar un nuevo enlace
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                ¿Necesitás ayuda?{' '}
+                <Link to="/contacto" className="font-semibold text-primary hover:underline">
+                  Contactanos
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </AuthLayout>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <div className="w-full max-w-md">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl text-center">
-                {done ? 'Contraseña actualizada' : 'Nueva contraseña'}
-              </CardTitle>
-              <CardDescription className="text-center">
-                {done
-                  ? 'Redirigiendo al login...'
-                  : 'Ingresá tu nueva contraseña'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {done ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-4 space-y-4"
-                >
-                  <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-500" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Cambiaste tu contraseña correctamente.
-                  </p>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {error && (
-                    <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm text-center">
-                      {error}
-                    </div>
-                  )}
+    <AuthLayout {...layoutProps}>
+      <Card className="border-border/60 shadow-lg shadow-black/5">
+        <CardContent className="p-6 sm:p-8">
+          {done ? (
+            <div role="status" aria-live="polite" className="flex flex-col items-center gap-5 py-2 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                <CheckCircle2 className="h-7 w-7" />
+              </span>
+              <div className="space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight">Contraseña actualizada</h1>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Ya podés ingresar con tu nueva contraseña. Te llevamos al inicio de sesión en unos
+                  segundos.
+                </p>
+              </div>
+              <Link
+                to="/login"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Ir al inicio de sesión
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6 space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight">Nueva contraseña</h1>
+                <p className="text-sm text-muted-foreground">
+                  Elegí una clave segura para recuperar el acceso a tu cuenta.
+                </p>
+              </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-                      Nueva contraseña
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Mínimo 8 caracteres"
-                        required
-                        className="w-full h-11 pl-10 pr-10 rounded-xl border border-gray-200 dark:border-gray-700 text-base bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all focus:border-gray-300 dark:focus:border-gray-600"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base transition-all hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+              <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                {submitError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
                   >
-                    {isSubmitting ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      'Cambiar contraseña'
-                    )}
-                  </button>
-                </form>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </div>
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }))
+                      }}
+                      placeholder="Mínimo 8 caracteres"
+                      aria-required="true"
+                      aria-invalid={Boolean(errors.password)}
+                      aria-describedby={errors.password ? 'password-error' : 'password-hint'}
+                      className={cn(
+                        fieldBase,
+                        errors.password
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : 'border-input focus-visible:border-primary',
+                      )}
+                    />
+                    <PasswordToggle
+                      visible={showPassword}
+                      onToggle={() => setShowPassword((value) => !value)}
+                    />
+                  </div>
+                  {errors.password ? (
+                    <p id="password-error" role="alert" className="text-xs font-medium text-destructive">
+                      {errors.password}
+                    </p>
+                  ) : (
+                    <p id="password-hint" className="text-xs text-muted-foreground">
+                      Usá al menos 8 caracteres.
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="confirm" className="block text-sm font-medium text-foreground">
+                    Repetir contraseña
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      id="confirm"
+                      type={showConfirm ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={confirm}
+                      onChange={(e) => {
+                        setConfirm(e.target.value)
+                        if (errors.confirm) setErrors((prev) => ({ ...prev, confirm: undefined }))
+                      }}
+                      placeholder="Repetí tu contraseña"
+                      aria-required="true"
+                      aria-invalid={Boolean(errors.confirm)}
+                      aria-describedby={errors.confirm ? 'confirm-error' : undefined}
+                      className={cn(
+                        fieldBase,
+                        errors.confirm
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : 'border-input focus-visible:border-primary',
+                      )}
+                    />
+                    <PasswordToggle
+                      visible={showConfirm}
+                      onToggle={() => setShowConfirm((value) => !value)}
+                    />
+                  </div>
+                  {errors.confirm && (
+                    <p id="confirm-error" role="alert" className="text-xs font-medium text-destructive">
+                      {errors.confirm}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      Guardar contraseña
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                ¿Problemas con el enlace?{' '}
+                <Link to="/contacto" className="font-semibold text-primary hover:underline">
+                  Contactanos
+                </Link>
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </AuthLayout>
   )
 }

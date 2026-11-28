@@ -1,120 +1,223 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import AuthLayout from '@/components/auth/AuthLayout'
 import { useAuthStore } from '@/stores/authStore'
-import { Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import {
+  AlertCircle,
+  ChevronRight,
+  Clock,
+  Loader2,
+  Mail,
+  MailCheck,
+  Send,
+  ShieldCheck,
+} from 'lucide-react'
+
+const features = [
+  {
+    icon: MailCheck,
+    title: 'Enlace directo',
+    desc: 'Enviamos las instrucciones al email con el que te registraste.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Proceso seguro',
+    desc: 'Solo vos podés abrir el enlace de recuperación.',
+  },
+  {
+    icon: Clock,
+    title: 'Vigencia limitada',
+    desc: 'Por seguridad, el enlace caduca después de un tiempo.',
+  },
+]
+
+const fieldBase =
+  'w-full h-12 rounded-xl border bg-transparent pl-11 pr-4 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  const [fieldError, setFieldError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [shakeKey, setShakeKey] = useState(0)
   const resetPassword = useAuthStore((s) => s.resetPassword)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setFieldError('')
+
+    const trimmed = email.trim()
+    if (!trimmed) {
+      setFieldError('Ingresá tu email')
+      setShakeKey((k) => k + 1)
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setFieldError('Email inválido')
+      setShakeKey((k) => k + 1)
+      return
+    }
+
     setIsSubmitting(true)
     try {
-      await resetPassword(email)
+      await resetPassword(trimmed)
+      setEmail(trimmed)
       setSent(true)
     } catch (err) {
-      setError(err.message || 'Error al enviar el email')
+      setError(err.message || 'No pudimos enviar el email. Intentá de nuevo.')
+      setShakeKey((k) => k + 1)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <div className="w-full max-w-md">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al login
-          </Link>
-        </motion.div>
+    <AuthLayout
+      asideTitle="Recuperá el acceso a tu cuenta"
+      asideDescription="Te enviamos un enlace seguro para que puedas volver a entrar en minutos."
+      features={features}
+    >
+      <Card className="border-border/60 shadow-lg shadow-black/5">
+        <CardContent className="p-6 sm:p-8">
+          {sent ? (
+            <div role="status" aria-live="polite" className="flex flex-col items-center gap-5 py-2 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                <MailCheck className="h-7 w-7" />
+              </span>
+              <div className="space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight">Revisá tu correo</h1>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Si existe una cuenta con <span className="font-medium text-foreground">{email}</span>,
+                  te enviamos un enlace para restablecer tu contraseña.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ¿No lo ves? Revisá la carpeta de spam o correo no deseado.
+                </p>
+              </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl text-center">Recuperar Contraseña</CardTitle>
-              <CardDescription className="text-center">
-                {sent
-                  ? 'Revisá tu email para el link de recuperación'
-                  : 'Ingresá tu email y te enviaremos las instrucciones'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {sent ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-4 space-y-4"
+              <div className="flex w-full flex-col gap-2">
+                <Link
+                  to="/login"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-500" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Si existe una cuenta con ese email, vas a recibir un link para restablecer tu contraseña.
-                  </p>
-                  <Link
-                    to="/login"
-                    className="inline-block text-sm font-semibold text-primary hover:underline"
+                  Volver al inicio de sesión
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSent(false)
+                    setEmail('')
+                  }}
+                  className="h-11 w-full rounded-xl border text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Usar otro email
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6 space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight">Recuperar contraseña</h1>
+                <p className="text-sm text-muted-foreground">
+                  Ingresá tu email y te enviaremos las instrucciones para restablecerla.
+                </p>
+              </div>
+
+              <motion.form
+                key={shakeKey}
+                animate={shakeKey ? { x: [0, -8, 8, -8, 8, -4, 4, 0] } : {}}
+                transition={{ duration: 0.4 }}
+                onSubmit={handleSubmit}
+                noValidate
+                className="space-y-5"
+              >
+                {error && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
                   >
-                    Volver al login
-                  </Link>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {error && (
-                    <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm text-center">
-                      {error}
-                    </div>
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      inputMode="email"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (fieldError) setFieldError('')
+                        if (error) setError('')
+                      }}
+                      placeholder="tu@email.com"
+                      aria-required="true"
+                      aria-invalid={Boolean(fieldError)}
+                      aria-describedby={fieldError ? 'email-error' : undefined}
+                      className={cn(
+                        fieldBase,
+                        fieldError
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : 'border-input focus-visible:border-primary',
+                      )}
+                    />
+                  </div>
+                  {fieldError && (
+                    <p id="email-error" role="alert" className="text-xs font-medium text-destructive">
+                      {fieldError}
+                    </p>
                   )}
+                </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="tu@email.com"
-                        required
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 dark:border-gray-700 text-base bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all focus:border-gray-300 dark:focus:border-gray-600"
-                      />
-                    </div>
-                  </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Enviando enlace...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      Enviar instrucciones
+                    </>
+                  )}
+                </button>
+              </motion.form>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 rounded-xl bg-primary text-white font-semibold text-base transition-all hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      'Enviar instrucciones'
-                    )}
-                  </button>
-                </form>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </div>
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                ¿Ya la recordaste?{' '}
+                <Link to="/login" className="font-semibold text-primary hover:underline">
+                  Iniciá sesión
+                </Link>
+              </p>
+              <p className="mt-2 text-center text-sm text-muted-foreground">
+                ¿No tenés cuenta?{' '}
+                <Link to="/registro" className="font-semibold text-primary hover:underline">
+                  Registrate
+                </Link>
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </AuthLayout>
   )
 }
